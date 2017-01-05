@@ -1,0 +1,3 @@
+the problem was in the code : 
+the line "high := mid - 1" was replaced with "high := mid"
+and the line "low := mid" was replaced with "low := mid + 1"
