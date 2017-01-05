@@ -6,10 +6,8 @@ ensures c == a0+b0;
   var a, b, g, m := a0, b0, 1, 0;
   while (a > 0 || b > 0) 
   decreases a+b
-  invariant c == (a0 + b0)%g
-  invariant a == a0/g && b == b0/g
-  invariant m + c +a*g +b*g == a0 + b0
-  invariant g > 0 && 0 <= c <= a0+b0
+  invariant 0<=m <=2
+  invariant a0 + b0 == c + g*(a+b+m);
   {
     m := m + a % 2 + b % 2; //m 0,1,2,3
     a := a / 2;
