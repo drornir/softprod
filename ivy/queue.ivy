@@ -37,7 +37,9 @@ action push(n:node , l:list) = {
 		}
 	};	
 	inList(n,l):=true;
-	assert head(n,l) & tail(X,l)
+	assert head(n,l) & exists X. tail(X,l)
+
+
 
 	
 }
