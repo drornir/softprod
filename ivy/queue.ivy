@@ -81,6 +81,7 @@ export pop
 
 conjecture empty(L) -> ~head(N,L)
 conjecture empty(L) -> ~tail(N,L)
+conjecture empty(L) -> ~inList(N,L)
 
 conjecture ~empty(L) -> exists N. head(N,L)
 conjecture ~empty(L) -> exists N. tail(N,L)
@@ -102,4 +103,5 @@ conjecture ( inList (N1,L) & (next (N1,N2) | next(N2,N1)) ) -> inList (N2,L)
 
 conjecture ( head(N1,L) & tail (N1,L) & inList(N2,L) ) -> N1 = N2
 conjecture ( head(N1,L) & tail (N1,L) & inList(N2,L) ) -> N1 = N2
+
 
