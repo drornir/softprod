@@ -64,11 +64,11 @@ action pop(l:list) returns(n:node) = {
 }
 
 action test = {
-  assert ~(X ~= Z & head(X,L) & head(Z,L)); #2 heads
-  assert ~(X ~= Z & tail(X,L) & tail(Z,L)); #2 tails
-  assert ~(empty(L) & head(X,L)); #empty with head
-  assert ~(head(X,L)& ~inList(X,L));#head not in list
-  assert ~(tail(X,L)& ~inList(X,L))#tail not in list 
+  assert ~(X ~= Z & head(X,L) & head(Z,L)); #no 2 heads
+  assert ~(X ~= Z & tail(X,L) & tail(Z,L)); #no 2 tails
+  assert ~(empty(L) & head(X,L)); #no empty with head
+  assert ~(head(X,L)& ~inList(X,L));#no head not in list
+  assert ~(tail(X,L)& ~inList(X,L))#no tail not in list 
 }
 
 export test
@@ -76,16 +76,16 @@ export push
 export pop
 
 
-conjecture ~(head(N,L) & empty(L))
-conjecture ~(tail(N,L) & empty(L))
+conjecture ~(head(N,L) & empty(L)) #empty list has no head
+conjecture ~(tail(N,L) & empty(L)) #empty list has no tail
 conjecture ~(empty(L) & head(N,L))
 conjecture ~(empty(L) & tail(N,L))
-conjecture ~(next(N,N))
+conjecture ~(next(N,N)) # node cant be its own next
 conjecture ~(head(N,L) & head(P,L) & N ~= P) #no 2 heads
 conjecture ~(tail(N,L) & tail(P,L) & N ~= P) #no 2 tails
 
 conjecture ~(head(N,L) & ~inList(N,L)) # head must be in list
 conjecture ~(tail(N,L) & ~inList(N,L)) # tail must be in list
 
-conjecture (inList(N1,L) & inList(N2,L) & N1~=N2 & tail(N1,L)) -> exists X. inList(X,L) & next(X,N1) # this is the correct one
+conjecture (inList(N1,L) & inList(N2,L) & N1~=N2 & tail(N1,L)) -> exists X. inList(X,L) & next(X,N1) # if a list contains at least 2 nodes, 1 element must have tail node, as its next
 
