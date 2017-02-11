@@ -64,11 +64,11 @@ action pop(l:list) returns(n:node) = {
 }
 
 action test = {
-  assert ~(X ~= Z & head(X,L) & head(Z,L)) #2 heads
- # assert ~(X ~= Z & tail(X,L) & tail(Z,L)); #2 tails
-#  assert ~(empty(L) & head(X,L));#empty with head
-#assert ~(head(X,L)& ~inList(X,L));#head not in list
-#assert ~(tail(X,L)& ~inList(X,L))#tail not in list 
+  assert ~(X ~= Z & head(X,L) & head(Z,L)); #2 heads
+  assert ~(X ~= Z & tail(X,L) & tail(Z,L)); #2 tails
+  assert ~(empty(L) & head(X,L)); #empty with head
+  assert ~(head(X,L)& ~inList(X,L));#head not in list
+  assert ~(tail(X,L)& ~inList(X,L))#tail not in list 
 }
 
 export test
@@ -81,7 +81,8 @@ conjecture ~(tail(N,L) & empty(L))
 conjecture ~(empty(L) & head(N,L))
 conjecture ~(empty(L) & tail(N,L))
 conjecture ~(next(N,N))
-conjecture ~(head(N,L) & head(P,L) & N ~= P & ~empty(L)) #no 2 heads
+conjecture ~(head(N,L) & head(P,L) & N ~= P) #no 2 heads
+conjecture ~(tail(N,L) & tail(P,L) & N ~= P) #no 2 tails
 
 conjecture ~(head(N,L) & ~inList(N,L)) # head must be in list
 conjecture ~(tail(N,L) & ~inList(N,L)) # tail must be in list
