@@ -1,0 +1,74 @@
+#lang ivy1.5
+
+type node
+type list
+type val
+
+relation head(H:node,L:list)	#if H is head in L
+relation tail(T:node,L:list)	#if T is tail in L
+relation inList(N:node,L:list)  #if N is in L
+relation next(N1:node,N2:node)	#if N1.next is N2 
+relation empty(L:list)	#if list is empty
+
+init empty(L) & ~head(H,L) & ~tail(T,L) & ~inList(N,L)#all lists are empty and has no tails and no heads
+
+
+action push(n:node , l:list) = {
+	if empty(l) { #note to self last line before "}" should be without ";"
+		assume ~tail(X,l) & ~head(X,l);
+
+		#if the list is empty set "n" to be the head and tail of the list "l"
+
+		tail(n,l):=true;
+		empty(l):=false;
+		head(n,l):=true
+		
+	} else {
+
+		assume tail(X,l) & head(X,l);
+		#the list is not empty set "n" to be the head and the previous head "x" to be "n.next" 	
+
+		if some x:node. head(x,l) { #note to self last line before "}" should be without ";"
+			next(n,x):=true;
+			head(x,l):=false;
+			head(n,l):=true;
+			assume(next(n,x))
+		}
+	};	
+	inList(n,l):=true;
+	assume head(n,l) & tail(X,l)
+
+	
+}
+
+action pop(l:list) returns(n:node) = {
+		assume ~empty(l);
+		if some x:node. tail(x,l) {
+			n:=x;
+
+			#find "l's" tail then change its previous to be the new tail if doesnt exist set list to empty 
+
+			if some y:node. next(y,x) & inList(y,l){	#note to self last line before "}" should be without ";"
+				tail(x,l):=false;
+				tail(y,l):=true
+			}else{ #note to self last line before "}" should be without ";"
+				empty(l):=true;
+				tail(x,l):=false;
+				head(x,l):=false
+			};
+			inList(x,l):=false
+		};
+		assume tail(X,l)|empty(l)
+}
+
+action test = {
+  assert ~(X ~= Z & head(X,L) & head(Z,L)); #2 heads
+  assert ~(X ~= Z & tail(X,L) & tail(Z,L)); #2 tails
+  assert ~(empty(L) & head(X,L));#empty with head
+assert ~(head(X,L)& ~inList(X,L));#head not in list
+assert ~(tail(X,L)& ~inList(X,L))#tail not in list 
+}
+
+export test
+export push
+export pop
