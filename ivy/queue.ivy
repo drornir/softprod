@@ -85,3 +85,6 @@ conjecture ~(head(N,L) & head(P,L) & N ~= P & ~empty(L)) #no 2 heads
 
 conjecture ~(head(N,L) & ~inList(N,L)) # head must be in list
 conjecture ~(tail(N,L) & ~inList(N,L)) # tail must be in list
+
+conjecture (inList(N1,L) & inList(N2,L) & N1~=N2 & tail(N1,L)) -> exists X. inList(X,L) & next(X,N1) # this is the correct one
+
