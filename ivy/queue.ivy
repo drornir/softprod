@@ -114,4 +114,10 @@ conjecture next (A,B) -> exists L. (inList(A,L) & inList (B,L))
 
 conjecture (inList (N,L1) & inList (N,L2)) -> L1=L2
 
+conjecture tail(N,L) -> ~next(N,X)
+#conjecture (inList(N1,L) & inList(N2,L) & N1~=N2 & ~head(N1,L)) -> exists X. inList(X,L) & next(X,N1)
+
+
+
+
 
