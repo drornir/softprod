@@ -54,7 +54,8 @@ action pop(l:list) returns(n:node) = {
 
 			if some y:node. next(y,x) & inList(y,l){	#note to self last line before "}" should be without ";"
 				tail(x,l):=false;
-				tail(y,l):=true
+				tail(y,l):=true;
+				next(y,x):= false
 			}else{ #note to self last line before "}" should be without ";"
 				empty(l):=true;
 				tail(x,l):=false;
