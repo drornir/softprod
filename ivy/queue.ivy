@@ -14,7 +14,7 @@ init empty(L) & ~head(H,L) & ~tail(T,L) & ~inList(N,L) & ~next(N1,N2)#all lists 
 
 
 action push(n:node , l:list) = {
-	assume ~inList(n,l);
+	assume ~inList(n,L);#not in any list
 	if empty(l) { #note to self last line before "}" should be without ";"
 		assert ~tail(X,l) & ~head(X,l);
 
@@ -103,5 +103,14 @@ conjecture ( inList (N1,L) & (next (N1,N2) | next(N2,N1)) ) -> inList (N2,L)
 
 conjecture ( head(N1,L) & tail (N1,L) & inList(N2,L) ) -> N1 = N2
 conjecture ( head(N1,L) & tail (N1,L) & inList(N2,L) ) -> N1 = N2
+
+conjecture (tail (N1,L) & inList(N2,L) & N1 ~= N2 ) -> exists X. next(X,N1)
+conjecture next(A,B) -> ~next(B,A)
+
+conjecture (next(N,A) & next (N,B)) -> A=B
+conjecture head (H,N) -> ~next(X,H)
+conjecture next (A,B) -> exists L. (inList(A,L) & inList (B,L))
+
+conjecture (inList (N,L1) & inList (N,L2)) -> L1=L2
 
 
