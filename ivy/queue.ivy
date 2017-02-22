@@ -9,8 +9,9 @@ relation tail(T:node,L:list)	#if T is tail in L
 relation inList(N:node,L:list)  #if N is in L
 relation next(N1:node,N2:node)	#if N1.next is N2 
 relation empty(L:list)	#if list is empty
+relation reach (N1:node, N2:node)# if N2 is reachable from N1
 
-init empty(L) & ~head(H,L) & ~tail(T,L) & ~inList(N,L) & ~next(N1,N2)#all lists are empty and has no tails and no heads
+init empty(L) & ~head(H,L) & ~tail(T,L) & ~inList(N,L) & ~next(N1,N2) & ~reach(N3,N4)#all lists are empty and has no tails and no heads
 
 
 action push(n:node , l:list) = {
@@ -31,9 +32,13 @@ action push(n:node , l:list) = {
 
 		if some x:node. head(x,l) { #note to self last line before "}" should be without ";"
 			next(n,x):=true;
+			reach(n,x):= true;
 			head(x,l):=false;
 			head(n,l):=true;
-			assert(next(n,x))
+			assert(next(n,x));
+			if some n1:node. reach (x,n1) {
+				reach(n,n1):=true
+			}
 		}
 	};	
 	inList(n,l):=true;
@@ -55,7 +60,10 @@ action pop(l:list) returns(n:node) = {
 			if some y:node. next(y,x) & inList(y,l){	#note to self last line before "}" should be without ";"
 				tail(x,l):=false;
 				tail(y,l):=true;
-				next(y,x):= false
+				next(y,x):= false;
+				if some w:node. reach(w,x) {
+					reach(w,x):=false
+				}
 			}else{ #note to self last line before "}" should be without ";"
 				empty(l):=true;
 				tail(x,l):=false;
@@ -116,6 +124,8 @@ conjecture (inList (N,L1) & inList (N,L2)) -> L1=L2
 
 conjecture tail(N,L) -> ~next(N,X)
 #conjecture (inList(N1,L) & inList(N2,L) & N1~=N2 & ~head(N1,L)) -> exists X. inList(X,L) & next(X,N1)
+
+conjecture (head(H,L) & inList(N,L) & (H~= N)) -> reach(H,N)
 
 
 
