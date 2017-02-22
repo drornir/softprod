@@ -117,6 +117,7 @@ conjecture (tail (N1,L) & inList(N2,L) & N1 ~= N2 ) -> exists X. next(X,N1)
 conjecture next(A,B) -> ~next(B,A)
 
 conjecture (next(N,A) & next (N,B)) -> A=B
+conjecture (next(N1,A) & next (N2,A)) -> N1=N2
 conjecture head (H,N) -> ~next(X,H)
 conjecture next (A,B) -> exists L. (inList(A,L) & inList (B,L))
 
@@ -126,8 +127,8 @@ conjecture tail(N,L) -> ~next(N,X)
 #conjecture (inList(N1,L) & inList(N2,L) & N1~=N2 & ~head(N1,L)) -> exists X. inList(X,L) & next(X,N1)
 
 conjecture (head(H,L) & inList(N,L) & (H~= N)) -> reach(H,N)
+conjecture (reach(N1,N2) & reach (N2,N3)) -> reach(N1,N3)
+conjecture (reach(N,N1) & reach (N,N2) & (N1 ~=N2)) -> (reach (N1,N2) | reach (N2,N1))
+conjecture ~reach(N,N)
 
-
-
-
-
+conjecture (reach(N1,N2) & inList (N1,L)) -> exists X. (next (N1,X) & inList(X,L))
