@@ -1,134 +1,78 @@
 #lang ivy1.5
 
 type node
-type list
-type val
+type state
 
-relation head(H:node,L:list)	#if H is head in L
-relation tail(T:node,L:list)	#if T is tail in L
-relation inList(N:node,L:list)  #if N is in L
-relation next(N1:node,N2:node)	#if N1.next is N2 
-relation empty(L:list)	#if list is empty
 relation reach (N1:node, N2:node)# if N2 is reachable from N1
+individual sentinel:node
+individual head:node
+individual tail:node
+individual empty:node
 
-init empty(L) & ~head(H,L) & ~tail(T,L) & ~inList(N,L) & ~next(N1,N2) & ~reach(N3,N4)#all lists are empty and has no tails and no heads
+individual a:node
+individual b:node
+individual q1:state
+individual q2:state
+individual qe:state
+individual qc:state #current state
+axiom q1~=q2
+axiom q2~=qe
+axiom q1~=qe
+axiom Q = q1 | Q = q2 | Q = qe
+init reach(N1,N2) <-> N1=N2#all lists are empty and has no tails and no heads
+init sentinel=head & head=tail & empty~=head
+init qc = q1
 
+action q1_action = {
+    assume qc = q1;
+    local x: node{
+        if * {
+            call push(x);
+            if x = a {
+                qc := q2
+            }
+        }
+        else {
+            call x := pop();
+            if x = a {
+                qc := qe
+            }
+        }
+    }
 
-action push(n:node , l:list) = {
-	assume ~inList(n,L);#not in any list
-	if empty(l) { #note to self last line before "}" should be without ";"
-		assert ~tail(X,l) & ~head(X,l);
+}
+#conjecture after we write all state actions: qc ~=qe
 
-		#if the list is empty set "n" to be the head and tail of the list "l"
-
-		tail(n,l):=true;
-		empty(l):=false;
-		head(n,l):=true
-		
-	} else {
-
-		assert exists X. tail(X,l) & exists Y. head(Y,l);
-		#the list is not empty set "n" to be the head and the previous head "x" to be "n.next" 	
-
-		if some x:node. head(x,l) { #note to self last line before "}" should be without ";"
-			next(n,x):=true;
-			reach(n,x):= true;
-			head(x,l):=false;
-			head(n,l):=true;
-			assert(next(n,x));
-			if some n1:node. reach (x,n1) {
-				reach(n,n1):=true
-			}
-		}
-	};	
-	inList(n,l):=true;
-	assert head(n,l) & exists X. tail(X,l)
-
-
-
-	
+action push(n:node) = {
+    assume n~= empty;
+    assume ~reach(head,n);
+    reach(X,Y):= reach(X,Y) | (reach(X,tail) & Y=n);
+    tail:=n
 }
 
-action pop(l:list) returns(n:node) = {
-		assume ~empty(l);
-		#assume inList(n,l);
-		if some x:node. tail(x,l) {
-			n:=x;
+action pop() returns(n:node) = {
+    if (head=tail) {
+        n:=empty
+    }
+    else {
+        assume reach(head,n) & ((reach(X,n) ->(n=X | X=head))) & n~=head;
 
-			#find "l's" tail then change its previous to be the new tail if doesnt exist set list to empty 
-
-			if some y:node. next(y,x) & inList(y,l){	#note to self last line before "}" should be without ";"
-				tail(x,l):=false;
-				tail(y,l):=true;
-				next(y,x):= false;
-				if some w:node. reach(w,x) {
-					reach(w,x):=false
-				}
-			}else{ #note to self last line before "}" should be without ";"
-				empty(l):=true;
-				tail(x,l):=false;
-				head(x,l):=false
-			};
-			inList(x,l):=false
-		};
-		assert (exists X. tail(X,l) )|empty(l)
+        reach(X,Y):= (reach(X,Y) & Y~=n & X~=n) | X=Y;
+        if (reach(head,X) -> head=X) {
+            tail:=head
+        }
+    }
 }
-
 action test = {
-  assert ~(X ~= Z & head(X,L) & head(Z,L)); #no 2 heads
-  assert ~(X ~= Z & tail(X,L) & tail(Z,L)); #no 2 tails
-  assert ~(empty(L) & head(X,L)); #no empty with head
-  assert ~(head(X,L)& ~inList(X,L));#no head not in list
-  assert ~(tail(X,L)& ~inList(X,L))#no tail not in list 
 }
-
 export test
 export push
 export pop
 
 
-
-conjecture empty(L) -> ~head(N,L)
-conjecture empty(L) -> ~tail(N,L)
-conjecture empty(L) -> ~inList(N,L)
-
-conjecture ~empty(L) -> exists N. head(N,L)
-conjecture ~empty(L) -> exists N. tail(N,L)
-
-
-
-conjecture ~(next(N,N)) # node cant be its own next
-conjecture ~(head(N,L) & head(P,L) & N ~= P) #no 2 heads
-conjecture ~(tail(N,L) & tail(P,L) & N ~= P) #no 2 tails
-
-conjecture head(N,L) -> inList(N,L) # head must be in list
-conjecture tail(N,L) -> inList(N,L) # tail must be in list
-
-conjecture (inList(N1,L) & inList(N2,L) & N1~=N2 & tail(N1,L)) -> exists X. inList(X,L) & next(X,N1) # if a list contains at least 2 nodes, 1 element must have tail node, as its next
-
-conjecture head(N,L) -> inList (N,L)
-conjecture tail(N,L) -> inList (N,L)
-conjecture ( inList (N1,L) & (next (N1,N2) | next(N2,N1)) ) -> inList (N2,L)
-
-conjecture ( head(N1,L) & tail (N1,L) & inList(N2,L) ) -> N1 = N2
-conjecture ( head(N1,L) & tail (N1,L) & inList(N2,L) ) -> N1 = N2
-
-conjecture (tail (N1,L) & inList(N2,L) & N1 ~= N2 ) -> exists X. next(X,N1)
-conjecture next(A,B) -> ~next(B,A)
-
-conjecture (next(N,A) & next (N,B)) -> A=B
-conjecture (next(N1,A) & next (N2,A)) -> N1=N2
-conjecture head (H,N) -> ~next(X,H)
-conjecture next (A,B) -> exists L. (inList(A,L) & inList (B,L))
-
-conjecture (inList (N,L1) & inList (N,L2)) -> L1=L2
-
-conjecture tail(N,L) -> ~next(N,X)
-#conjecture (inList(N1,L) & inList(N2,L) & N1~=N2 & ~head(N1,L)) -> exists X. inList(X,L) & next(X,N1)
-
-conjecture (head(H,L) & inList(N,L) & (H~= N)) -> reach(H,N)
-conjecture (reach(N1,N2) & reach (N2,N3)) -> reach(N1,N3)
-conjecture (reach(N,N1) & reach (N,N2) & (N1 ~=N2)) -> (reach (N1,N2) | reach (N2,N1))
-conjecture ~reach(N,N)
-
-conjecture (reach(N1,N2) & inList (N1,L)) -> exists X. (next (N1,X) & inList(X,L))
+conjecture reach(X,X)
+conjecture (reach(X,Y) & reach(Y,Z)) -> reach(X,Z)
+conjecture reach(X,Y) & reach(Y,X) -> X=Y
+conjecture reach(X,Y) & reach(X,Z) -> reach(Y,Z) | reach(Z,Y)
+conjecture reach(head,tail)
+conjecture (forall X. reach(head,X) -> (head=X)) -> head=tail
