@@ -42,9 +42,9 @@ axiom a ~= sentinel
 axiom b ~= sentinel
 axiom empty ~= sentinel
 
-init reach(N1, N2) <-> N1 = N2 #every node is reachable only from itself
+init reach(N1, N2) <-> N1 = N2 # every node is reachable only from itself
 init sentinel = head & head = tail & empty ~= head # the list contains only the head sentinel
-init qc = q1 #the DFA initial state is q1
+init qc = q1 # the DFA initial state is q1
 
 action q1_action = {
     assume qc = q1;
@@ -60,7 +60,7 @@ action q1_action = {
       }
       else {
         call x := pop();
-        if x = a | x = b {
+        if x = a | x = b{
             qc := qe
         }
       }
