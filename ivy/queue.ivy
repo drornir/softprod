@@ -18,9 +18,12 @@ individual q3:state # both a,b are inside
 individual q4:state # a outsde, b inside
 individual qe:state
 individual qc:state #current state
-axiom q1~=q2
-axiom q2~=qe
+
 axiom q1~=qe
+
+axiom q2~=q1
+axiom q2~=qe
+
 axiom q3~=q1
 axiom q3~=q2
 axiom q3~=qe
@@ -194,3 +197,4 @@ conjecture (reach (X,empty) | reach (empty, X)) -> X= empty
 
 conjecture qc=q4 ->~reach (a,tail)
 conjecture qc=q4-> reach(b,tail)
+
