@@ -57,11 +57,11 @@ action q1_action = {
         if x = a {
             qc := q2
         }
-      }
-      else {
-        call x := pop();
-        if x = a {
-            qc := qe
+        else {
+            call x := pop();
+            if x = a | x=b {
+                qc := qe
+            }
         }
         if x = b {
             qc := qe
@@ -86,7 +86,7 @@ action q2_action = {
 		}
 		else {
 			call x:=pop();
-			if x= b {
+			if x= b | x=empty {
 				qc:=qe
 			};
 			if x= a {
@@ -203,3 +203,6 @@ conjecture (reach (X,empty) | reach (empty, X)) -> X= empty
 
 conjecture qc=q4 ->~reach (a,tail)
 conjecture qc=q4-> reach(b,tail)
+
+
+
