@@ -4,6 +4,7 @@ type node
 type state
 
 relation reach (N1:node, N2:node)# if N2 is reachable from N1
+relation nondet
 individual sentinel:node
 individual head:node
 individual tail:node
@@ -26,7 +27,8 @@ init qc = q1
 action q1_action = {
     assume qc = q1;
     local x: node{
-        if * {
+		nondet:=*;
+        if nondet {
             call push(x);
             if x = a {
                 qc := q2
@@ -50,7 +52,7 @@ action push(n:node) = {
     tail:=n
 }
 
-action pop() returns(n:node) = {
+action pop returns(n:node) = {
     if (head=tail) {
         n:=empty
     }
