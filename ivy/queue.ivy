@@ -15,7 +15,7 @@ individual b:node
 individual q1:state # a,b outside of queue
 individual q2:state # a inside, b outside
 individual q3:state # both a,b are inside
-individual q4:state # a outsde, b inside
+individual q4:state # a outside, b inside
 individual qe:state
 individual qc:state #current state
 
@@ -42,28 +42,31 @@ axiom a~= sentinel
 axiom b~= sentinel
 axiom empty~= sentinel
 
-init reach(N1,N2) <-> N1=N2#all lists are empty and has no tails and no heads
-init sentinel=head & head=tail & empty~=head
-init qc = q1
+init reach(N1,N2) <-> N1=N2 #every node is reachable only from itself
+init sentinel=head & head=tail & empty~=head # the list contains only the head sentinel
+init qc = q1 #the DFA initial state is q1
 
 action q1_action = {
     assume qc = q1;
     local x: node{
-		nondet:=*;
-        if nondet {
-			assume x~=empty;
-			assume x~= b;
-            call push(x);
-            if x = a {
-                qc := q2
-            }
+  		nondet:=*;
+      if nondet {
+    	  assume x~=empty;
+    		assume x~= b;
+        call push(x);
+        if x = a {
+            qc := q2
         }
-        else {
-            call x := pop();
-            if x = a {
-                qc := qe
-            }
+      }
+      else {
+        call x := pop();
+        if x = a {
+            qc := qe
         }
+        if x = b {
+            qc := qe
+          }
+      }
     }
 
 }
@@ -88,6 +91,9 @@ action q2_action = {
 			};
 			if x= a {
 				qc:= q1
+			};
+      if x= empty {
+				qc:=qe
 			}
 		}
 	}
@@ -143,11 +149,11 @@ action q4_action = {
 
 
 action push(n:node) = {
-    assume n~= empty;
-    assume ~reach(head,n);
-	assume reach(n,X) -> X=n;
-    reach(X,Y):= reach(X,Y) | (reach(X,tail) & Y=n);
-    tail:=n
+  assume n~= empty;
+  assume ~reach(head,n);
+  assume reach(n,X) -> X=n;
+  reach(X,Y):= reach(X,Y) | (reach(X,tail) & Y=n);
+  tail:=n
 }
 
 action pop returns(n:node) = {
@@ -157,7 +163,7 @@ action pop returns(n:node) = {
     else {
         assume reach(head,n) & ((reach(X,n) ->(n=X | X=head))) & n~=head;
         reach(X,Y):= (reach(X,Y) & Y~=n & X~=n) | X=Y;
-		
+
         if (reach(head,X) -> head=X) {
             tail:=head
         }
@@ -197,4 +203,3 @@ conjecture (reach (X,empty) | reach (empty, X)) -> X= empty
 
 conjecture qc=q4 ->~reach (a,tail)
 conjecture qc=q4-> reach(b,tail)
-
