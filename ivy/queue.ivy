@@ -114,6 +114,30 @@ action q3_action = {
 	}
 }
 
+action q4_action = {
+	assume qc=q4;
+	local x:node {
+		assume x~=a & x~=b;
+		nondet:=*;
+		if nondet {
+			assume x~=empty;
+			call push(x)
+		}
+		else {
+			call x:=pop();
+			if x=b {
+				qc:=q1
+			};
+			if x=a {
+				qc:=qe
+			};
+			if x=empty {
+				qc:=qe
+			}
+		}
+	}
+}
+
 
 action push(n:node) = {
     assume n~= empty;
@@ -144,6 +168,7 @@ action test = {
 export q1_action
 export q2_action
 export q3_action
+export q4_action
 
 
 conjecture reach(X,X)
@@ -167,5 +192,5 @@ conjecture qc=q3 -> (reach(a,tail) & reach (b,tail) & reach (a,b))
 conjecture reach(X,tail) -> reach(head,X)
 conjecture (reach (X,empty) | reach (empty, X)) -> X= empty
 
-
-
+conjecture qc=q4 ->~reach (a,tail)
+conjecture qc=q4-> reach(b,tail)
