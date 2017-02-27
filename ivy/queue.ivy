@@ -19,11 +19,15 @@ individual qc:state #current state
 axiom q1~=q2
 axiom q2~=qe
 axiom q1~=qe
+
 axiom Q = q1 | Q = q2 | Q = qe
 
 axiom a~=b
 axiom a~=empty
 axiom b~=empty
+axiom a~= sentinel
+axiom b~= sentinel
+axiom empty~= sentinel
 
 init reach(N1,N2) <-> N1=N2#all lists are empty and has no tails and no heads
 init sentinel=head & head=tail & empty~=head
@@ -35,6 +39,7 @@ action q1_action = {
 		nondet:=*;
         if nondet {
 			assume x~=empty;
+			assume x~= b;
             call push(x);
             if x = a {
                 qc := q2
@@ -49,7 +54,30 @@ action q1_action = {
     }
 
 }
-#conjecture after we write all state actions: qc ~=qe
+
+action q2_action = {
+	assume qc = q2;
+	local x:node {
+		assume x~=a;
+		nondet:=*;
+		if nondet {
+			assume x~=empty;
+			assume x~=b; #to be removed
+			call push(x)
+
+		}
+		else {
+			call x:=pop();
+			if x= b {
+				qc:=qe
+			};
+			if x= a {
+				qc:= q1
+			}
+		}
+	}
+}
+
 
 action push(n:node) = {
     assume n~= empty;
@@ -78,6 +106,7 @@ action test = {
 #export push
 #export pop
 export q1_action
+export q2_action
 
 
 conjecture reach(X,X)
@@ -90,3 +119,10 @@ conjecture reach(tail,X) -> X=tail
 conjecture qc ~= qe
 conjecture empty ~=head & empty ~=sentinel & empty ~= tail
 conjecture qc=q1 -> (reach(X,a) | reach(a,X)) -> (X=a & a~=head & a~=tail)
+conjecture qc=q1 -> ~reach(b,tail)
+conjecture head=tail -> head = sentinel
+conjecture qc =q2 -> reach(a,tail)
+conjecture qc =q2 -> ~reach(b,tail)
+conjecture sentinel = head
+conjecture head=tail -> ( reach(X,tail) -> X = tail )
+conjecture (reach(X,Y) & X~=Y) -> reach(X,tail)# if a node is connected, it must be in the queue
