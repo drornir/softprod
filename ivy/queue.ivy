@@ -60,12 +60,9 @@ action q1_action = {
       }
       else {
         call x := pop();
-        if x = a {
+        if x = a | x = b {
             qc := qe
         }
-        if x = b {
-            qc := qe
-          }
       }
     }
 
@@ -89,11 +86,8 @@ action q2_action = {
 			if x= b {
 				qc:=qe
 			};
-			if x= a {
+			if x= a | x= empty {
 				qc:= q1
-			};
-      if x= empty {
-				qc:=qe
 			}
 		}
 	}
@@ -110,11 +104,8 @@ action q3_action = {
 		}
 		else {
 			call x:=pop();
-			if x=b {
+			if x=b | x=empty {
 			 qc:=qe
-			};
-			if x=empty {
-				qc:=qe
 			};
 			if x= a {
 				qc:=q4
@@ -137,10 +128,7 @@ action q4_action = {
 			if x=b {
 				qc:=q1
 			};
-			if x=a {
-				qc:=qe
-			};
-			if x=empty {
+			if x=a | x=empty  {
 				qc:=qe
 			}
 		}
