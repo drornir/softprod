@@ -60,7 +60,7 @@ action q1_action = {
       }
       else {
         call x := pop();
-        if x = a | x = b{
+        if x = a | x = b {
             qc := qe
         }
       }
