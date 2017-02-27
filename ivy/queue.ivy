@@ -12,9 +12,10 @@ individual empty:node
 
 individual a:node
 individual b:node
-individual q1:state
-individual q2:state
-individual q3:state
+individual q1:state # a,b outside of queue
+individual q2:state # a inside, b outside
+individual q3:state # both a,b are inside
+individual q4:state # a outsde, b inside
 individual qe:state
 individual qc:state #current state
 axiom q1~=q2
@@ -24,7 +25,12 @@ axiom q3~=q1
 axiom q3~=q2
 axiom q3~=qe
 
-axiom Q = q1 | Q = q2 | Q = qe | Q=q3
+axiom q4~=q1
+axiom q4~=q2
+axiom q4~=q3
+axiom q4~=qe
+
+axiom Q = q1 | Q = q2 | Q = qe | Q=q3 | Q=q4
 
 axiom a~=b
 axiom a~=empty
@@ -84,6 +90,30 @@ action q2_action = {
 	}
 }
 
+action q3_action = {
+	assume qc=q3;
+	local x:node {
+		assume x~= a & x~=b;
+		nondet:=*;
+		if nondet {
+			assume x~=empty;
+			call push(x)
+		}
+		else {
+			call x:=pop();
+			if x=b {
+			 qc:=qe
+			};
+			if x=empty {
+				qc:=qe
+			};
+			if x= a {
+				qc:=q4
+			}
+		}
+	}
+}
+
 
 action push(n:node) = {
     assume n~= empty;
@@ -113,6 +143,7 @@ action test = {
 #export pop
 export q1_action
 export q2_action
+export q3_action
 
 
 conjecture reach(X,X)
@@ -132,3 +163,9 @@ conjecture qc =q2 -> ~reach(b,tail)
 conjecture sentinel = head
 conjecture head=tail -> ( reach(X,tail) -> X = tail )
 conjecture (reach(X,Y) & X~=Y) -> reach(X,tail)# if a node is connected, it must be in the queue
+conjecture qc=q3 -> (reach(a,tail) & reach (b,tail) & reach (a,b))
+conjecture reach(X,tail) -> reach(head,X)
+conjecture (reach (X,empty) | reach (empty, X)) -> X= empty
+
+
+
