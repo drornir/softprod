@@ -14,13 +14,17 @@ individual a:node
 individual b:node
 individual q1:state
 individual q2:state
+individual q3:state
 individual qe:state
 individual qc:state #current state
 axiom q1~=q2
 axiom q2~=qe
 axiom q1~=qe
+axiom q3~=q1
+axiom q3~=q2
+axiom q3~=qe
 
-axiom Q = q1 | Q = q2 | Q = qe
+axiom Q = q1 | Q = q2 | Q = qe | Q=q3
 
 axiom a~=b
 axiom a~=empty
@@ -62,8 +66,10 @@ action q2_action = {
 		nondet:=*;
 		if nondet {
 			assume x~=empty;
-			assume x~=b; #to be removed
-			call push(x)
+			call push(x);
+			if x = b {
+				qc:=q3
+			}
 
 		}
 		else {
