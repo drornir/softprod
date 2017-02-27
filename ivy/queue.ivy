@@ -20,6 +20,11 @@ axiom q1~=q2
 axiom q2~=qe
 axiom q1~=qe
 axiom Q = q1 | Q = q2 | Q = qe
+
+axiom a~=b
+axiom a~=empty
+axiom b~=empty
+
 init reach(N1,N2) <-> N1=N2#all lists are empty and has no tails and no heads
 init sentinel=head & head=tail & empty~=head
 init qc = q1
@@ -29,6 +34,7 @@ action q1_action = {
     local x: node{
 		nondet:=*;
         if nondet {
+			assume x~=empty;
             call push(x);
             if x = a {
                 qc := q2
@@ -59,8 +65,8 @@ action pop returns(n:node) = {
     }
     else {
         assume reach(head,n) & ((reach(X,n) ->(n=X | X=head))) & n~=head;
-
         reach(X,Y):= (reach(X,Y) & Y~=n & X~=n) | X=Y;
+		
         if (reach(head,X) -> head=X) {
             tail:=head
         }
@@ -81,3 +87,6 @@ conjecture reach(X,Y) & reach(X,Z) -> reach(Y,Z) | reach(Z,Y)
 conjecture reach(head,tail)
 conjecture (forall X. reach(head,X) -> (head=X)) -> head=tail
 conjecture reach(tail,X) -> X=tail
+conjecture qc ~= qe
+conjecture empty ~=head & empty ~=sentinel & empty ~= tail
+conjecture qc=q1 -> (reach(X,a) | reach(a,X)) -> (X=a & a~=head & a~=tail)
