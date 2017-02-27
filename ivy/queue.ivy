@@ -48,6 +48,7 @@ action q1_action = {
 action push(n:node) = {
     assume n~= empty;
     assume ~reach(head,n);
+	assume reach(n,X) -> X=n;
     reach(X,Y):= reach(X,Y) | (reach(X,tail) & Y=n);
     tail:=n
 }
@@ -67,9 +68,10 @@ action pop returns(n:node) = {
 }
 action test = {
 }
-export test
-export push
-export pop
+#export test
+#export push
+#export pop
+export q1_action
 
 
 conjecture reach(X,X)
@@ -78,3 +80,4 @@ conjecture reach(X,Y) & reach(Y,X) -> X=Y
 conjecture reach(X,Y) & reach(X,Z) -> reach(Y,Z) | reach(Z,Y)
 conjecture reach(head,tail)
 conjecture (forall X. reach(head,X) -> (head=X)) -> head=tail
+conjecture reach(tail,X) -> X=tail
