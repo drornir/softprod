@@ -1,5 +1,9 @@
 #lang ivy1.5
 
+# List implementation notes:
+# - all nodes are reachable to themselves, even if they are not in the list
+# - the head is a sentinel
+
 type node
 type state
 
@@ -16,8 +20,8 @@ individual q1:state # a,b outside of queue
 individual q2:state # a inside, b outside
 individual q3:state # both a,b are inside
 individual q4:state # a outside, b inside
-individual qe:state
-individual qc:state #current state
+individual qe:state # error state (throws)
+individual qc:state #pointer to current state
 
 axiom q1 ~= qe
 
@@ -44,7 +48,7 @@ axiom empty ~= sentinel
 
 init reach(N1, N2) <-> N1 = N2 # every node is reachable only from itself
 init sentinel = head & head = tail & empty ~= head # the list contains only the head sentinel
-init qc = q1 # the DFA initial state is q1
+init qc = q1 # the DFA's initial state is q1
 
 action q1_action = {
     assume qc = q1;
@@ -53,19 +57,18 @@ action q1_action = {
       if nondet {
     	  assume x ~= empty;
     		assume x ~= b;
-        call push(x);
+        call enq(x);
         if x = a {
             qc := q2
         }
       }
       else {
-        call x := pop();
+        call x := deq();
         if x = a | x = b {
             qc := qe
         }
       }
     }
-
 }
 
 action q2_action = {
@@ -75,14 +78,13 @@ action q2_action = {
 		nondet := *;
 		if nondet {
       assume x ~= empty;
-			call push(x);
+			call enq(x);
 			if x = b {
 				qc := q3
 			}
-
 		}
 		else {
-			call x := pop();
+			call x := deq();
 			if x = b | x = empty {
 				qc := qe
 			};
@@ -100,10 +102,10 @@ action q3_action = {
 		nondet := *;
 		if nondet {
 			assume x ~= empty;
-			call push(x)
+			call enq(x)
 		}
 		else {
-			call x := pop();
+			call x := deq();
 			if x = b | x = empty {
 			 qc := qe
 			};
@@ -121,10 +123,10 @@ action q4_action = {
 		nondet := *;
 		if nondet {
 			assume x ~= empty;
-			call push(x)
+			call enq(x)
 		}
 		else {
-			call x := pop();
+			call x := deq();
 			if x = b {
 				qc := q1
 			};
@@ -136,7 +138,7 @@ action q4_action = {
 }
 
 
-action push(n:node) = {
+action enq(n:node) = {
   assume n~= empty;
   assume ~reach(head,n);
   assume reach(n,X) -> X = n;
@@ -144,14 +146,13 @@ action push(n:node) = {
   tail := n
 }
 
-action pop returns(n:node) = {
+action deq returns(n:node) = {
     if (head = tail) {
         n := empty
     }
     else {
         assume reach(head,n) & ((reach(X,n) -> (n=X | X=head))) & n ~= head;
         reach(X,Y):= (reach(X,Y) & Y ~= n & X ~= n) | X = Y;
-
         if (reach(head,X) -> head = X) {
             tail := head
         }
@@ -160,8 +161,8 @@ action pop returns(n:node) = {
 action test = {
 }
 #export test
-#export push
-#export pop
+#export enq
+#export deq
 export q1_action
 export q2_action
 export q3_action
