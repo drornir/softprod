@@ -19,53 +19,50 @@ individual q4:state # a outside, b inside
 individual qe:state
 individual qc:state #current state
 
-axiom q1~=qe
+axiom q1 ~= qe
 
-axiom q2~=q1
-axiom q2~=qe
+axiom q2 ~= q1
+axiom q2 ~= qe
 
-axiom q3~=q1
-axiom q3~=q2
-axiom q3~=qe
+axiom q3 ~= q1
+axiom q3 ~= q2
+axiom q3 ~= qe
 
-axiom q4~=q1
-axiom q4~=q2
-axiom q4~=q3
-axiom q4~=qe
+axiom q4 ~= q1
+axiom q4 ~= q2
+axiom q4 ~= q3
+axiom q4 ~= qe
 
 axiom Q = q1 | Q = q2 | Q = qe | Q=q3 | Q=q4
 
-axiom a~=b
-axiom a~=empty
-axiom b~=empty
-axiom a~= sentinel
-axiom b~= sentinel
-axiom empty~= sentinel
+axiom a ~= b
+axiom a ~= empty
+axiom b ~= empty
+axiom a ~= sentinel
+axiom b ~= sentinel
+axiom empty ~= sentinel
 
-init reach(N1,N2) <-> N1=N2 #every node is reachable only from itself
-init sentinel=head & head=tail & empty~=head # the list contains only the head sentinel
+init reach(N1, N2) <-> N1 = N2 #every node is reachable only from itself
+init sentinel = head & head = tail & empty ~= head # the list contains only the head sentinel
 init qc = q1 #the DFA initial state is q1
 
 action q1_action = {
     assume qc = q1;
-    local x: node{
-  		nondet:=*;
+    local x:node{
+  		nondet := *;
       if nondet {
-    	  assume x~=empty;
-    		assume x~= b;
+    	  assume x ~= empty;
+    		assume x ~= b;
         call push(x);
         if x = a {
             qc := q2
         }
-        else {
-            call x := pop();
-            if x = a | x=b {
-                qc := qe
-            }
-        }
-        if x = b {
+      }
+      else {
+        call x := pop();
+        if x = a | x = b{
             qc := qe
-          }
+        }
       }
     }
 
@@ -74,74 +71,65 @@ action q1_action = {
 action q2_action = {
 	assume qc = q2;
 	local x:node {
-		assume x~=a;
-		nondet:=*;
+		assume x ~= a;
+		nondet := *;
 		if nondet {
-			assume x~=empty;
+      assume x ~= empty;
 			call push(x);
 			if x = b {
-				qc:=q3
+				qc := q3
 			}
 
 		}
 		else {
-			call x:=pop();
-			if x= b | x=empty {
-				qc:=qe
+			call x := pop();
+			if x = b | x = empty {
+				qc := qe
 			};
 			if x= a {
-				qc:= q1
-			};
-      if x= empty {
-				qc:=qe
+				qc := q1
 			}
 		}
 	}
 }
 
 action q3_action = {
-	assume qc=q3;
+	assume qc = q3;
 	local x:node {
-		assume x~= a & x~=b;
-		nondet:=*;
+		assume x ~= a & x ~= b;
+		nondet := *;
 		if nondet {
-			assume x~=empty;
+			assume x ~= empty;
 			call push(x)
 		}
 		else {
-			call x:=pop();
-			if x=b {
-			 qc:=qe
+			call x := pop();
+			if x = b | x = empty {
+			 qc := qe
 			};
-			if x=empty {
-				qc:=qe
-			};
-			if x= a {
-				qc:=q4
+			if x = a {
+				qc := q4
 			}
 		}
 	}
 }
 
 action q4_action = {
-	assume qc=q4;
+	assume qc = q4;
 	local x:node {
-		assume x~=a & x~=b;
-		nondet:=*;
+		assume x ~= a & x ~= b;
+		nondet := *;
 		if nondet {
-			assume x~=empty;
+			assume x ~= empty;
 			call push(x)
 		}
 		else {
-			call x:=pop();
-			if x=b {
-				qc:=q1
+			call x := pop();
+			if x = b {
+				qc := q1
 			};
-			if x=a {
-				qc:=qe
-			};
-			if x=empty {
-				qc:=qe
+			if x = a | x = empty{
+				qc := qe
 			}
 		}
 	}
@@ -151,21 +139,21 @@ action q4_action = {
 action push(n:node) = {
   assume n~= empty;
   assume ~reach(head,n);
-  assume reach(n,X) -> X=n;
-  reach(X,Y):= reach(X,Y) | (reach(X,tail) & Y=n);
-  tail:=n
+  assume reach(n,X) -> X = n;
+  reach(X,Y) := reach(X,Y) | (reach(X,tail) & Y = n);
+  tail := n
 }
 
 action pop returns(n:node) = {
-    if (head=tail) {
-        n:=empty
+    if (head = tail) {
+        n := empty
     }
     else {
-        assume reach(head,n) & ((reach(X,n) ->(n=X | X=head))) & n~=head;
-        reach(X,Y):= (reach(X,Y) & Y~=n & X~=n) | X=Y;
+        assume reach(head,n) & ((reach(X,n) -> (n=X | X=head))) & n ~= head;
+        reach(X,Y):= (reach(X,Y) & Y ~= n & X ~= n) | X = Y;
 
-        if (reach(head,X) -> head=X) {
-            tail:=head
+        if (reach(head,X) -> head = X) {
+            tail := head
         }
     }
 }
@@ -182,10 +170,10 @@ export q4_action
 
 conjecture reach(X,X)
 conjecture (reach(X,Y) & reach(Y,Z)) -> reach(X,Z)
-conjecture reach(X,Y) & reach(Y,X) -> X=Y
+conjecture reach(X,Y) & reach(Y,X) -> X = Y
 conjecture reach(X,Y) & reach(X,Z) -> reach(Y,Z) | reach(Z,Y)
 conjecture reach(head,tail)
-conjecture (forall X. reach(head,X) -> (head=X)) -> head=tail
+conjecture (forall X. reach(head,X) -> (head = X)) -> head = tail
 conjecture reach(tail,X) -> X=tail
 conjecture qc ~= qe
 conjecture empty ~=head & empty ~=sentinel & empty ~= tail
@@ -203,6 +191,3 @@ conjecture (reach (X,empty) | reach (empty, X)) -> X= empty
 
 conjecture qc=q4 ->~reach (a,tail)
 conjecture qc=q4-> reach(b,tail)
-
-
-
