@@ -1,0 +1,78 @@
+#lang ivy1.5
+
+#based on this implementation: https://www.cs.rochester.edu/research/synchronization/pseudocode/queues.html
+
+type node
+type state
+type thread
+type line
+
+relation reach (N1:node, N2:node)# if N2 is reachable from N1
+relation nondet
+relation inLine (T:thread, L:line) # each thread currently in l0 or some line in the dequeue or enqueue
+relation used (N:node) #in order to simulate 'new' node being created
+relation threadTail (T:thread,N:node)# local variable of tail in thread t
+relation threadEnqNode(T:thread, N:node) # the node thread T is trying to enqueue
+relation head(N:node)
+relation tail(N:node)
+
+
+individual l0:line #starting line
+individual e0:line # first line in enqeue
+individual e1:line
+individual d0:line #first line in dequeue
+
+individual initNode:node
+
+axiom l0 ~= e0
+axiom l0 ~= e1
+axiom l0 ~= d0
+
+axiom e1~=e0
+axiom e0~=d0
+axiom e1~=d0
+
+init inLine(T,l0) & (inLine (T,L) -> L=l0)
+init used(N) -> N=initNode
+init head(N) -> N=initNode
+init tail(N) -> N=initNode
+init ~threadEnqNode(T,N)
+
+
+action l0_action(t:thread) = { #decide on an action (enqueue or dequeue)
+	assume inLine (t,l0);
+	inLine(t,l0) := false;
+	nondet :=*;
+	if nondet {
+		inLine(t,d0) := false
+	}
+	else {
+		inLine (t,e0) := true
+	}
+	
+}
+
+action e0_action (t:thread,n:node)= { #simulating lines E1-E5 in the code
+	assume inLine(t,e0);
+	assume ~used(n);
+	threadEnqNode(t,n):= true;
+	used(n):= true;
+
+	threadTail = some N: tail(N);
+
+	inLine(t,e0):= false;
+	inLine (t,e1):= true
+}
+
+action test = {
+	assert (threadEnqNode (T,N1) & threadEnqNode (T,N2)) -> N1=N2
+}
+
+export l0_action
+export e0_action
+export test
+
+conjecture (threadEnqNode (T,N1) & threadEnqNode (T,N2)) -> N1=N2
+conjecture (inLine (T,L) & (L=l0 | L=e0 | L=d0) ) -> ~threadEnqNode(T,N)
+conjecture (inLine (T,L1) & inLine (T,L2)) -> L1=L2
+conjecture head(N1) & head(N2) -> N1=N2
