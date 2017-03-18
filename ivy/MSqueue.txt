@@ -39,6 +39,8 @@ D1:  while (true) {
 D2:    Node* first = head;
 D3:    Node* last = tail;
 D4:    Node* next = first->next;
+NOTE THERE IS AN EMAIL FROM ADAM THAT TELLS US WHAT TO DO HERE
+DELETE THESE TWO LINES ONLY AFTER YOU'VE RESOLVED THIS
 D5:    if (first == last) { // maybe empty
 D6:      if (next == NULL) {
             // read of first->next above is the
@@ -52,3 +54,8 @@ D12:     if (CAS(&head, first, next)) {
             // successful CAS is linearization point
 D13:        return T;
 } } } }
+
+היי אדם,
+בשקופית של הdequeue רשום בהערה ש-"read of first->next above is the linearization point of EMPTY".
+האם זאת לא בעיה שיש נק' לינאריזציה שאנחנו יודעים עליה רק אחרי שתי שורות קוד?
+לכאורה כן, אבל בפועל אפשר לבצע את שתי השורות באלו באופן אטומי יחד עם הקריאה של first->next, מאחר שיודעים כבר האם first == last והאם next יצא NULL.
