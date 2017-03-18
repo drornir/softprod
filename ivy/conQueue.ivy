@@ -36,6 +36,11 @@ individual e4:line # second compare and CAS if needed
 individual e5:line # last line in enqeue
 
 individual d0:line #first line in dequeue
+individual d1:line #first line in dequeue
+individual d2:line #first line in dequeue
+individual d3:line #first line in dequeue
+individual d4:line #first line in dequeue
+individual d5:line #first line in dequeue
 
 individual initNode:node
 
@@ -151,8 +156,8 @@ action e0_action (t:thread,n:node)= { #simulating lines E1
 action e1_action (t:thread,n:node)= { #simulating line E5 in the code return here if loop ends w\o break
 	assume inLine(t,e1);
 	threadTail(t,M):=false; 	#set to false for all nodes
-	if some n:node. tail(n) {
-		threadTail(t,N):=true 	#threadTail = some N: tail(N);
+	if some nn:node. tail(nn) {
+		threadTail(t,nn):=true
 	};
 	inLine(t,e1):= false;
 	inLine (t,e2):= true
