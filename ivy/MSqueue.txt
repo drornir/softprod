@@ -1,0 +1,54 @@
+struct Node {
+	T value;
+	Node* next;
+
+	Node(T val) {
+		value = val;
+	}
+}
+
+// globals
+Node* head;
+Node* tail;
+
+// initialization
+n = new Node;
+n->next = NULL;
+head = tail = 0;
+
+void enq(T value) {
+E1:  Node* node = new Node(value);
+E2:  while (true) {
+E3:    Node* last = tail;
+E4:    Node* next = last->next;
+E5:    if (tail != last) // inconsistent view, retry
+E6:      continue;
+E7:    if (next == NULL) {
+E8:      if (CAS(&last->next, next, node))
+           // successful CAS is linearization point
+E9:        break;
+E10:   } else {
+E11:     CAS(&tail, last, next);
+E12:   }
+E13: }
+E14: CAS(&tail, last, node);
+}
+
+T deq(void) {
+D1:  while (true) {
+D2:    Node* first = head;
+D3:    Node* last = tail;
+D4:    Node* next = first->next;
+D5:    if (first == last) { // maybe empty
+D6:      if (next == NULL) {
+            // read of first->next above is the
+            // linearization point of EMPTY
+D7:        return EMPTY;
+D8:      }
+D9:      CAS(&tail, last, next);
+D10:   } else {
+D11:     T value = first->value;
+D12:     if (CAS(&head, first, next)) {
+            // successful CAS is linearization point
+D13:        return T;
+} } } }
