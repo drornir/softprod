@@ -1,6 +1,6 @@
 #lang ivy1.5
 
-#based on this implementation: https://www.cs.rochester.edu/research/synchronization/pseudocode/queues.html
+# no longer based on this implementation: https://www.cs.rochester.edu/research/synchronization/pseudocode/queues.html
 
 type node
 type state
@@ -12,7 +12,7 @@ relation nondet
 relation inLine (T:thread, L:line) # each thread currently in l0 or some line in the dequeue or enqueue
 relation used (N:node) #in order to simulate 'new' node being created
 
-#enq vars 
+#enq vars
 relation threadTail (T:thread,N:node)# local variable of tail in thread t
 relation threadEnqNode(T:thread, N:node) # the node thread T is trying to enqueue
 relation threadEnqNext(T:thread, N:node) # the node which is "next" in line 6 in enqueue
@@ -20,7 +20,7 @@ relation threadEnqNext(T:thread, N:node) # the node which is "next" in line 6 in
 relation threadDeqHead(T:thread, N:node)#the head in deq
 relation threadDeqTail(T:thread, N:node)#the tail in deq
 relation threadDeqNext(T:thread, N:node)#next
-relation threadDeqReturnNode(T:thread, N:node)#rv 
+relation threadDeqReturnNode(T:thread, N:node)#rv
 
 relation head(N:node)
 relation tail(N:node)
@@ -31,7 +31,7 @@ individual l0:line #starting line
 individual e0:line # first line in enqeue
 individual e1:line # first line in enqeue loop
 individual e2:line # set "next"
-individual e3:line # first compare 
+individual e3:line # first compare
 individual e4:line # second compare and CAS if needed
 individual e5:line # last line in enqeue
 
@@ -132,15 +132,15 @@ action l0_action(t:thread) = { #decide on an action (enqueue or dequeue)
 	inLine(t,l0) := false;
 	nondet :=*;
 	if nondet {
-		inLine(t,d0) := false
+		inLine(t,d0) := true
 	}
 	else {
 		inLine (t,e0) := true
 	}
-	
+
 }
 
-action e0_action (t:thread,n:node)= { #simulating lines E1-E4 in the code --- was until e5 but e5 is start of loop 
+action e0_action (t:thread,n:node)= { #simulating lines E1
 	assume inLine(t,e0);
 	assume ~used(n);
 	threadEnqNode(t,n):= true;
@@ -148,31 +148,31 @@ action e0_action (t:thread,n:node)= { #simulating lines E1-E4 in the code --- wa
 	inLine(t,e0):= false;
 	inLine (t,e1):= true
 }
-action e1_action (t:thread,n:node)= { #simulating line E5 in the code return here if loop ends w\o break 
+action e1_action (t:thread,n:node)= { #simulating line E5 in the code return here if loop ends w\o break
 	assume inLine(t,e1);
-	threadTail(t,M):=false 	#set to false for all nodes
-	if some N: tail(N){
+	threadTail(t,M):=false; 	#set to false for all nodes
+	if some n:node. tail(n) {
 		threadTail(t,N):=true 	#threadTail = some N: tail(N);
-	}
+	};
 	inLine(t,e1):= false;
 	inLine (t,e2):= true
 }
 action e2_action (t:thread)= { #simulating line E6
 	assume inLine(t,e2);
-	threadEnqNext(t,M):=false	#set to false for all nodes 
-	if some N: threadTail(t,N){
-		if some M: reach(N,M) & ~reach(M,N) & ((reach(N,A)&A~=N) -> reach(M,A)){
-			threadEnqNext(t,M):=true	#"next" variable set . if we did not get here then its "null"
+	threadEnqNext(t,M):=false;	#set to false for all nodes
+	if some n:node. threadTail(t,n){
+		if some m:node. reach(n,m) & ~reach(m,n) & ((reach(n,A)&A~=n) -> reach(m,A)){
+			threadEnqNext(t,m):=true	#"next" variable set . if we did not get here then its "null"
 		}
-	}
+	};
 	inLine(t,e2):= false;
 	inLine (t,e3):= true
 }
 action e3_action (t:thread)= { #simulating line E7 //if the condition holds go to next line . otherwise go to loop start
 	assume inLine(t,e3);
-	if some N: threadTail(t,N){
-		if some M: tail(M){
-			if N=M{
+	if some n:node. threadTail(t,n) {
+		if some m:node. tail(m){
+			if n=m{
 				inLine(t,e3):= false;
 				inLine (t,e4):= true
 			}else{
@@ -184,13 +184,14 @@ action e3_action (t:thread)= { #simulating line E7 //if the condition holds go t
 }
 action e4_action (t:thread)= { #simulating line E8 //if the condition holds go to next line . otherwise go to loop start
 	assume inLine(t,e4);
-	if some N: threadEnqNext(t,N){#next.ptr != NULL
+	if some n:node. threadEnqNext(t,n){#next.ptr != NULL
 		# Try to swing Tail to the next node  CAS(&Q->Tail, tail, <next.ptr, tail.count+1>)
-		if some N: tail(N){
-			if some M: threadTail(t,M){
+		if some nn:node. tail(nn){
+			if some m:node. threadTail(t,m){
+				assert true
 				# should call CAS --- TODO line E13
 			}
-		}
+		};
 		inLine(t,e4):= false;
 		inLine (t,e1):= true
 	}else{
@@ -203,50 +204,50 @@ action e4_action (t:thread)= { #simulating line E8 //if the condition holds go t
 action e5_action (t:thread)= { #simulating line E17
 	assume inLine(t,e5);
 	#should call CAS line E17 TODO
-	#free thread 
+	#free thread
 	inLine(t,e5):= false;
 	inLine (t,l0):= true
 }
 
-action d0_action (t:thread)= { #simulating lines D1-D4 in the code 
+action d0_action (t:thread)= { #simulating lines D1-D4 in the code
 	assume inLine(t,d0);
 	inLine(t,d0):= false;
 	inLine (t,d1):= true
 }
 action d1_action (t:thread)= { #get local head
 	assume inLine(t,d1);
-	threadDeqHead(t,M):=false 	#set to false for all nodes
-	if some N: head(N){
-		threadDeqHead(t,N):=true 	
-	}
+	threadDeqHead(t,M):=false; 	#set to false for all nodes
+	if some n:node. head(n){
+		threadDeqHead(t,n):=true
+	};
 	inLine(t,d1):= false;
 	inLine (t,d2):= true
 }
 action d2_action (t:thread)= { #get local tail
 	assume inLine(t,d2);
-	threadDeqTail(t,M):=false 	#set to false for all nodes
-	if some N: tail(N){
-		threadDeqTail(t,N):=true 	
-	}
+	threadDeqTail(t,M):=false; 	#set to false for all nodes
+	if some n:node. tail(n){
+		threadDeqTail(t,n):=true
+	};
 	inLine(t,d2):= false;
 	inLine (t,d3):= true
 }
 action d3_action (t:thread) = {
 	assume inLine(t,d3);
-	threadDeqNext(t,M):=false	#set to false for all nodes 
-	if some N: threadDeqHead(t,N){
-		if some M: reach(N,M) & ~reach(M,N) & ((reach(N,A)&A~=N) -> reach(M,A)){
+	threadDeqNext(t,M):=false;	#set to false for all nodes
+	if some n:node. threadDeqHead(t,n){
+		if some m:node. reach(n,m) & ~reach(m,n) & ((reach(n,A)&A~=n) -> reach(m,A)){
 			threadDeqNext(t,M):=true	#"next" variable set . if we did not get here then its "null"
 		}
-	}
+	};
 	inLine(t,d3):= false;
-	inLine (t,d4):= true	
+	inLine (t,d4):= true
 }
 action d4_action (t:thread) = {#if head == real head continue to d5 else return to d0
 	assume inLine(t,d4);
-	if some N: threadDeqHead(t,N){
-		if some M: head(M){
-			if N=M{
+	if some n:node. threadDeqHead(t,n){
+		if some m:node. head(m){
+			if n=m{
 				inLine(t,d4):= false;
 				inLine (t,d5):= true
 			}else{
@@ -254,7 +255,7 @@ action d4_action (t:thread) = {#if head == real head continue to d5 else return 
 				inLine (t,d0):= true
 			}
 		}
-	}	
+	}
 }
 
 action test = {
