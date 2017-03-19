@@ -13,12 +13,12 @@ relation inLine (T:thread, L:line) # each thread currently in l0 or some line in
 relation used (N:node) #in order to simulate 'new' node being created
 
 #enq vars
-relation threadTail (T:thread,N:node)# local variable of tail in thread t
+relation threadEnqLast (T:thread,N:node)# local variable of last in thread t
 relation threadEnqNode(T:thread, N:node) # the node thread T is trying to enqueue
 relation threadEnqNext(T:thread, N:node) # the node which is "next" in line 6 in enqueue
 #deq vars
 relation threadDeqHead(T:thread, N:node)#the head in deq
-relation threadDeqTail(T:thread, N:node)#the tail in deq
+relation threadDeqLast(T:thread, N:node)#the tail in deq
 relation threadDeqNext(T:thread, N:node)#next
 relation threadDeqReturnNode(T:thread, N:node)#rv
 
@@ -43,6 +43,9 @@ individual d4:line #first line in dequeue
 individual d5:line #first line in dequeue
 
 individual initNode:node
+individual nullNode:node
+
+axion initNode ~=nullNode
 
 
 #line 0 different from all else
@@ -124,9 +127,9 @@ axiom d3~=d4
 
 
 init inLine(T,l0) & (inLine (T,L) -> L=l0)
-init used(N) -> N=initNode
 init head(N) -> N=initNode
 init tail(N) -> N=initNode
+init used(initNode & used(nullNode)
 init ~threadEnqNode(T,N)
 init ~threadTail(T,N)
 init ~threadEnqNext(T,N)
@@ -150,29 +153,37 @@ action e0_action (t:thread,n:node)= { #simulating lines E1
 	assume ~used(n);
 	threadEnqNode(t,n):= true;
 	used(n):= true;
+	reach(n,null):=true;
 	inLine(t,e0):= false;
 	inLine (t,e1):= true
 }
-action e1_action (t:thread,n:node)= { #simulating line E5 in the code return here if loop ends w\o break
+action e1_action (t:thread)= { #simulating line E3
 	assume inLine(t,e1);
-	threadTail(t,M):=false; 	#set to false for all nodes
-	if some nn:node. tail(nn) {
-		threadTail(t,nn):=true
-	};
+	threadLast(t,M):=false; 	#set to false for all nodes (edit: i dont think this is needed)
+	threadLast(t,tail):=true;
+
 	inLine(t,e1):= false;
 	inLine (t,e2):= true
 }
-action e2_action (t:thread)= { #simulating line E6
+action e2_action (t:thread,tLast:node)= { #simulating line E4
 	assume inLine(t,e2);
+	assume (threadEnqLast(t,tLast);
 	threadEnqNext(t,M):=false;	#set to false for all nodes
-	if some n:node. threadTail(t,n){
-		if some m:node. reach(n,m) & ~reach(m,n) & ((reach(n,A)&A~=n) -> reach(m,A)){
-			threadEnqNext(t,m):=true	#"next" variable set . if we did not get here then its "null"
-		}
-	};
+
+	assert some y. reach(tLast,y);#sanity check
+	next:=*;
+	assume reach(tLast,x) & (reach(N,x) -> reach(tLast,N));
+	threadEnqNext(t,x):=true;
+
 	inLine(t,e2):= false;
 	inLine (t,e3):= true
 }
+
+
+
+
+
+
 action e3_action (t:thread)= { #simulating line E7 //if the condition holds go to next line . otherwise go to loop start
 	assume inLine(t,e3);
 	if some n:node. threadTail(t,n) {
