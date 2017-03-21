@@ -15,7 +15,7 @@ relation used (N:node) #in order to simulate 'new' node being created
 #enq vars
 relation threadEnqLast (T:thread,N:node)# local variable of last in thread t
 relation threadEnqNode(T:thread, N:node) # the node thread T is trying to enqueue
-relation threadEnqNext(T:thread, N:node) # the node which is "next" in line 6 in enqueue
+relation threadEnqNext(T:thread, N:node) # the node which is "next" in line 4 in enqueue
 #deq vars
 relation threadDeqHead(T:thread, N:node)#the head in deq
 relation threadDeqLast(T:thread, N:node)#the tail in deq
