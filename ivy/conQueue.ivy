@@ -35,6 +35,7 @@ individual e3:line # first compare
 individual e4:line # second compare and CAS if needed
 individual e5:line # last line in enqeue
 individual e6:line
+individual e7:line
 
 individual d0:line #first line in dequeue
 individual d1:line #first line in dequeue
@@ -223,12 +224,35 @@ action e4_action (t:thread,tLast:node)= { #simulating line E7
 	}
 	
 }
-action e5_action (t:thread)= { #simulating line E8
-	#not finished
+action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating line E8
 	assume inLine(t,e5);
-	#should call CAS line E8 TODO
-	inLine(t,e5):= false;
-	inLine (t,l0):= true
+	assume threadEnqNode(t,newNode);
+	assume threadEnqLast(t,last);
+	assume reach(last,lastNext) & (reach(X,lastNext) -> reach(last,X));
+
+	if( cas(lastNext,nullNode,newNode)) {
+		inLine(t,e5):=false;
+		inLine(t,e6):=true #goto line E14
+	}
+	else {
+		inLine(t,e5):=false;
+		inLine(t,e7):=true #goto line E11
+	}
+}
+
+
+action e6_action (t:thread,globalTail:node,last:node,newNode:node) = { #line 14
+	assume tail(globalTail);
+	assume threadEnqLast(t,last);
+	assume threadEnqNode(t,newNode);
+
+	if cas(globalTail,last,newNode){ #the if has no meaning, this was the only way i got this to compile (all i wanted was to call the function)
+		last:= *
+	};
+
+
+	inLine(t,e6):=false;
+	inLine(t,l0):=true
 }
 
 action d0_action (t:thread)= { #simulating lines D1-D4 in the code
@@ -290,9 +314,16 @@ action cas (target:node, expected:node, newVal:node) returns (success:bool) = {
 
 export l0_action
 export e0_action
+export e1_action
+export e2_action
+export e3_action
+export e4_action
+export e5_action
 export test
 
 conjecture (threadEnqNode (T,N1) & threadEnqNode (T,N2)) -> N1=N2
 conjecture (inLine (T,L) & (L=l0 | L=e0 | L=d0) ) -> ~threadEnqNode(T,N)
 conjecture (inLine (T,L1) & inLine (T,L2)) -> L1=L2
 conjecture head(N1) & head(N2) -> N1=N2
+
+conjecture (threadEnqNext (T,N1) & threadEnqNext (T,N2)) -> N1=N2
