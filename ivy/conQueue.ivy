@@ -230,9 +230,9 @@ action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating 
 	assume threadEnqNode(t,newNode);
 	assume threadEnqLast(t,last);
 	assume reach(last,lastNext) & (reach(X,lastNext) -> reach(last,X));
-	
+
 	# cas(lastNext,nullNode,newNode)
-	if(lastNext = nullNode) {
+	if lastNext = nullNode {
 		reach(last, lastNext) := false;
 		reach(last, newNode) := true;
 		inLine(t,e5):=false;
@@ -240,22 +240,37 @@ action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating 
 	}
 	else {
 		inLine(t,e5):=false;
-		inLine(t,e7):=true #goto line E11
+		inLine(t,e6):=true #goto line E11
 	}
 }
 
+action e6_action (t:thread, globalTail:node, last:node, next:node) = { #line E11
+	assume inLine(t,e6);
+	assume tail(globalTail);
+	assume threadEnqLast(t,last);
+	assume threadEnqNext(t,next);
 
-action e6_action (t:thread,globalTail:node,last:node,newNode:node) = { #line 14
+	if globalTail = last {
+		tail(globalTail) := false;
+		tail(next) := true
+	};
+
+	inLine(t,e6):=false;
+	inLine(t,e7):=true #goto line E14
+}
+action e7_action (t:thread, globalTail:node, last:node, newNode:node) = { #line 14
+	assume inLine(t,e7);
 	assume tail(globalTail);
 	assume threadEnqLast(t,last);
 	assume threadEnqNode(t,newNode);
 
-	if cas(globalTail,last,newNode){ #the if has no meaning, this was the only way i got this to compile (all i wanted was to call the function)
-		last:= *
+	# cas(globalTail,last,newNode)
+	if globalTail = last {
+		tail(globalTail) := false;
+		tail(newNode) := true
 	};
 
-
-	inLine(t,e6):=false;
+	inLine(t,e7):=false;
 	inLine(t,l0):=true
 }
 
@@ -312,10 +327,6 @@ action test = {
 	assert (threadEnqNode (T,N1) & threadEnqNode (T,N2)) -> N1=N2
 }
 
-action cas (target:node, expected:node, newVal:node) returns (success:bool) = {
-
-}
-
 export l0_action
 export e0_action
 export e1_action
@@ -323,6 +334,8 @@ export e2_action
 export e3_action
 export e4_action
 export e5_action
+export e6_action
+export e7_action
 export test
 
 conjecture (threadEnqNode (T,N1) & threadEnqNode (T,N2)) -> N1=N2
