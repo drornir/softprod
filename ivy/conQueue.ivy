@@ -229,7 +229,7 @@ action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating 
 	assume inLine(t,e5);
 	assume threadEnqNode(t,newNode);
 	assume threadEnqLast(t,last);
-	assume reach(last,lastNext) & (reach(X,lastNext) -> reach(last,X));
+	assume reach(last,lastNext) & (reach(X,lastNext) -> reach(X,last));
 
 	# cas(lastNext,nullNode,newNode)
 	if lastNext = nullNode {
@@ -334,9 +334,15 @@ export e2_action
 export e3_action
 export e4_action
 export e5_action
-export e6_action
-export e7_action
+#export e6_action
+#export e7_action
 export test
+
+
+conjecture reach(X,X)
+conjecture (reach(X,Y) & reach(Y,Z)) -> reach(X,Z)
+conjecture reach(X,Y) & reach(Y,X) -> X = Y
+conjecture reach(X,Y) & reach(X,Z) -> reach(Y,Z) | reach(Z,Y)
 
 conjecture (threadEnqNode (T,N1) & threadEnqNode (T,N2)) -> N1=N2
 conjecture (inLine (T,L) & (L=l0 | L=e0 | L=d0) ) -> ~threadEnqNode(T,N)
@@ -346,3 +352,7 @@ conjecture head(N1) & head(N2) -> N1=N2
 conjecture (threadEnqNext (T,N1) & threadEnqNext (T,N2)) -> N1=N2
 
 conjecture reach(N,nullNode)
+
+conjecture head(X) -> used(X)
+conjecture tail(X) -> used(X)
+conjecture head(X) & reach (X,Y) -> used(Y)
