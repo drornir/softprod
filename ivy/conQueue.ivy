@@ -147,6 +147,7 @@ init used(initNode) & used(nullNode)
 init ~threadEnqNode(T,N)
 init ~threadEnqLast(T,N)
 init ~threadEnqNext(T,N)
+init reach(N,nullNode)
 
 
 action l0_action(t:thread) = { #decide on an action (enqueue or dequeue)
@@ -222,15 +223,18 @@ action e4_action (t:thread,tLast:node)= { #simulating line E7
 		inLine(t,e4):= false;
 		inLine(t,e6):= true
 	}
-	
+
 }
 action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating line E8
 	assume inLine(t,e5);
 	assume threadEnqNode(t,newNode);
 	assume threadEnqLast(t,last);
 	assume reach(last,lastNext) & (reach(X,lastNext) -> reach(last,X));
-
-	if( cas(lastNext,nullNode,newNode)) {
+	
+	# cas(lastNext,nullNode,newNode)
+	if(lastNext = nullNode) {
+		reach(last, lastNext) := false;
+		reach(last, newNode) := true;
 		inLine(t,e5):=false;
 		inLine(t,e6):=true #goto line E14
 	}
@@ -309,7 +313,7 @@ action test = {
 }
 
 action cas (target:node, expected:node, newVal:node) returns (success:bool) = {
-	
+
 }
 
 export l0_action
@@ -327,3 +331,5 @@ conjecture (inLine (T,L1) & inLine (T,L2)) -> L1=L2
 conjecture head(N1) & head(N2) -> N1=N2
 
 conjecture (threadEnqNext (T,N1) & threadEnqNext (T,N2)) -> N1=N2
+
+conjecture reach(N,nullNode)
