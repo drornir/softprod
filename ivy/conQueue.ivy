@@ -62,6 +62,11 @@ axiom l0 ~= e5
 axiom l0 ~= e6
 axiom l0 ~= e7
 axiom l0 ~= d0
+axiom l0 ~= d1
+axiom l0 ~= d2
+axiom l0 ~= d3
+axiom l0 ~= d4
+axiom l0 ~= d5
 
 
 axiom finishedLine ~= e0
@@ -72,6 +77,12 @@ axiom finishedLine ~= e4
 axiom finishedLine ~= e5
 axiom finishedLine ~= e6
 axiom finishedLine ~= e7
+axiom finishedLine ~= d0
+axiom finishedLine ~= d1
+axiom finishedLine ~= d2
+axiom finishedLine ~= d3
+axiom finishedLine ~= d4
+axiom finishedLine ~= d5
 
 #enqueue lines different
 axiom e0~=e1
@@ -86,6 +97,7 @@ axiom e0~=d1
 axiom e0~=d2
 axiom e0~=d3
 axiom e0~=d4
+axiom e0~=d5
 
 axiom e1~=e2
 axiom e1~=e3
@@ -98,6 +110,7 @@ axiom e1~=d1
 axiom e1~=d2
 axiom e1~=d3
 axiom e1~=d4
+axiom e1~=d5
 
 axiom e2~=e3
 axiom e2~=e4
@@ -109,6 +122,7 @@ axiom e2~=d1
 axiom e2~=d2
 axiom e2~=d3
 axiom e2~=d4
+axiom e2~=d5
 
 axiom e3~=e4
 axiom e3~=e5
@@ -119,6 +133,7 @@ axiom e3~=d1
 axiom e3~=d2
 axiom e3~=d3
 axiom e3~=d4
+axiom e3~=d5
 
 axiom e4~=e5
 axiom e4~=e6
@@ -128,6 +143,7 @@ axiom e4~=d1
 axiom e4~=d2
 axiom e4~=d3
 axiom e4~=d4
+axiom e4~=d5
 
 axiom e5~=e6
 axiom e5~=e7
@@ -136,6 +152,7 @@ axiom e5~=d1
 axiom e5~=d2
 axiom e5~=d3
 axiom e5~=d4
+axiom e5~=d5
 
 axiom e6~=e7
 axiom e6~=d0
@@ -143,20 +160,25 @@ axiom e6~=d1
 axiom e6~=d2
 axiom e6~=d3
 axiom e6~=d4
+axiom e6~=d5
 
 axiom d0~=d1
 axiom d0~=d2
 axiom d0~=d3
 axiom d0~=d4
+axiom d0~=d5
 
 axiom d1~=d2
 axiom d1~=d3
 axiom d1~=d4
+axiom d1~=d5
 
 axiom d2~=d3
 axiom d2~=d4
+axiom d2~=d5
 
 axiom d3~=d4
+axiom d3~=d5
 
 
 
@@ -356,7 +378,7 @@ export e2_action
 export e3_action
 export e4_action
 export e5_action
-export e6_action
+#export e6_action
 #export e7_action
 export test
 
