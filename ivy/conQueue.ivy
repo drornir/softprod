@@ -37,6 +37,8 @@ individual e5:line # last line in enqeue
 individual e6:line
 individual e7:line
 
+individual finishedLine:line
+
 individual d0:line #first line in dequeue
 individual d1:line #first line in dequeue
 individual d2:line #first line in dequeue
@@ -58,7 +60,18 @@ axiom l0 ~= e3
 axiom l0 ~= e4
 axiom l0 ~= e5
 axiom l0 ~= e6
+axiom l0 ~= e7
 axiom l0 ~= d0
+
+
+axiom finishedLine ~= e0
+axiom finishedLine ~= e1
+axiom finishedLine ~= e2
+axiom finishedLine ~= e3
+axiom finishedLine ~= e4
+axiom finishedLine ~= e5
+axiom finishedLine ~= e6
+axiom finishedLine ~= e7
 
 #enqueue lines different
 axiom e0~=e1
@@ -67,6 +80,7 @@ axiom e0~=e3
 axiom e0~=e4
 axiom e0~=e5
 axiom e0~=e6
+axiom e0~=e7
 axiom e0~=d0
 axiom e0~=d1
 axiom e0~=d2
@@ -77,7 +91,8 @@ axiom e1~=e2
 axiom e1~=e3
 axiom e1~=e4
 axiom e1~=e5
-axiom e0~=e6
+axiom e1~=e6
+axiom e1~=e7
 axiom e1~=d0
 axiom e1~=d1
 axiom e1~=d2
@@ -87,7 +102,8 @@ axiom e1~=d4
 axiom e2~=e3
 axiom e2~=e4
 axiom e2~=e5
-axiom e0~=e6
+axiom e2~=e6
+axiom e2~=e7
 axiom e2~=d0
 axiom e2~=d1
 axiom e2~=d2
@@ -96,7 +112,8 @@ axiom e2~=d4
 
 axiom e3~=e4
 axiom e3~=e5
-axiom e0~=e6
+axiom e3~=e6
+axiom e3~=e7
 axiom e3~=d0
 axiom e3~=d1
 axiom e3~=d2
@@ -105,18 +122,22 @@ axiom e3~=d4
 
 axiom e4~=e5
 axiom e4~=e6
+axiom e4~=e7
 axiom e4~=d0
 axiom e4~=d1
 axiom e4~=d2
 axiom e4~=d3
 axiom e4~=d4
 
+axiom e5~=e6
+axiom e5~=e7
 axiom e5~=d0
 axiom e5~=d1
 axiom e5~=d2
 axiom e5~=d3
 axiom e5~=d4
 
+axiom e6~=e7
 axiom e6~=d0
 axiom e6~=d1
 axiom e6~=d2
@@ -166,6 +187,7 @@ action l0_action(t:thread) = { #decide on an action (enqueue or dequeue)
 action e0_action (t:thread,n:node)= { #simulating lines E1
 	assume inLine(t,e0);
 	assume ~used(n);
+	assume (reach(X,n) | reach (n,X)) -> n=X;
 	threadEnqNode(t,n):= true;
 	used(n):= true;
 	reach(n,nullNode):=true;
@@ -271,7 +293,7 @@ action e7_action (t:thread, globalTail:node, last:node, newNode:node) = { #line 
 	};
 
 	inLine(t,e7):=false;
-	inLine(t,l0):=true
+	inLine(t,finishedLine):=true
 }
 
 action d0_action (t:thread)= { #simulating lines D1-D4 in the code
@@ -334,10 +356,9 @@ export e2_action
 export e3_action
 export e4_action
 export e5_action
-#export e6_action
+export e6_action
 #export e7_action
 export test
-
 
 conjecture reach(X,X)
 conjecture (reach(X,Y) & reach(Y,Z)) -> reach(X,Z)
@@ -356,3 +377,9 @@ conjecture reach(N,nullNode)
 conjecture head(X) -> used(X)
 conjecture tail(X) -> used(X)
 conjecture head(X) & reach (X,Y) -> used(Y)
+conjecture (head(X) & tail (Y)) -> reach (X,Y)
+conjecture (head(X) & head(Y)) -> X=Y 
+conjecture (tail(X) & tail(Y)) -> X=Y
+
+conjecture threadEnqNode(T,X) -> (reach(X,Y) -> X=Y)
+
