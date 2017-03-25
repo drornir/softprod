@@ -39,8 +39,6 @@ D1:  while (true) {
 D2:    Node* first = head;
 D3:    Node* last = tail;
 D4:    Node* next = first->next;
-NOTE THERE IS AN EMAIL FROM ADAM THAT TELLS US WHAT TO DO HERE
-DELETE THESE TWO LINES ONLY AFTER YOU'VE RESOLVED THIS
 D5:    if (first == last) { // maybe empty
 D6:      if (next == NULL) {
             // read of first->next above is the

@@ -1,5 +1,5 @@
 #lang ivy1.5
-
+# ivy ui=cti conQueue.ivy
 # no longer based on this implementation: https://www.cs.rochester.edu/research/synchronization/pseudocode/queues.html
 
 type node
@@ -216,6 +216,7 @@ action e0_action (t:thread,n:node)= { #simulating lines E1
 	inLine(t,e0):= false;
 	inLine (t,e1):= true
 }
+
 action e1_action (t:thread,globalTail:node)= { #simulating line E3
 	assume inLine(t,e1);
 	assume tail(globalTail);
@@ -226,22 +227,18 @@ action e1_action (t:thread,globalTail:node)= { #simulating line E3
 	inLine(t,e1):= false;
 	inLine (t,e2):= true
 }
-action e2_action (t:thread,tLast:node,next:node)= { #simulating line E4
+
+action e2_action (t:thread,tLast:node,lastNext:node)= { #simulating line E4
 	assume inLine(t,e2);
 	assume threadEnqLast(t,tLast);
-	assume reach(tLast,next) & (reach(N,next) -> reach(tLast,N));
+	assume reach(tLast,lastNext) & (reach(N,lastNext) -> reach(tLast,N));
 	threadEnqNext(t,M):=false;	#set to false for all nodes
 
-	threadEnqNext(t,next):=true;
+	threadEnqNext(t,lastNext):=true;
 
 	inLine(t,e2):= false;
 	inLine (t,e3):= true
 }
-
-
-
-
-
 
 action e3_action (t:thread,tLast:node,globalTail:node)= { #simulating line E5 //if the condition holds go to next line . otherwise go to loop start
 	assume inLine(t,e3);
@@ -302,6 +299,7 @@ action e6_action (t:thread, globalTail:node, last:node, next:node) = { #line E11
 	inLine(t,e6):=false;
 	inLine(t,e7):=true #goto line E14
 }
+
 action e7_action (t:thread, globalTail:node, last:node, newNode:node) = { #line 14
 	assume inLine(t,e7);
 	assume tail(globalTail);
@@ -318,53 +316,67 @@ action e7_action (t:thread, globalTail:node, last:node, newNode:node) = { #line 
 	inLine(t,finishedLine):=true
 }
 
-action d0_action (t:thread)= { #simulating lines D1-D4 in the code
+###################### DEQUEUE ########################
+
+action d0_action (t:thread)= { # D2 get local head
 	assume inLine(t,d0);
-	inLine(t,d0):= false;
-	inLine (t,d1):= true
-}
-action d1_action (t:thread)= { #get local head
-	assume inLine(t,d1);
-	threadDeqHead(t,M):=false; 	#set to false for all nodes
+	threadDeqHead(t,M) := false; 	#set to false for all nodes
 	if some n:node. head(n){
-		threadDeqHead(t,n):=true
+		threadDeqHead(t,n) := true
 	};
-	inLine(t,d1):= false;
-	inLine (t,d2):= true
+	inLine(t,d0) := false;
+	inLine (t,d1) := true
 }
-action d2_action (t:thread)= { #get local tail
-	assume inLine(t,d2);
-	threadDeqLast(t,M):=false; 	#set to false for all nodes
+
+action d1_action (t:thread)= { # D3 get local tail
+	assume inLine(t,d1);
+	threadDeqLast(t,M) := false; 	#set to false for all nodes
 	if some n:node. tail(n){
-		threadDeqLast(t,n):=true
+		threadDeqLast(t,n) := true
 	};
-	inLine(t,d2):= false;
-	inLine (t,d3):= true
+	inLine(t,d1) := false;
+	inLine (t,d2) := true
 }
-action d3_action (t:thread) = {
-	assume inLine(t,d3);
-	threadDeqNext(t,M):=false;	#set to false for all nodes
-#	if some n:node. threadDeqHead(t,n){
-#		if some m:node. reach(n,m) & ~reach(m,n) & ((reach(n,A)&A~=n) -> reach(m,A)){
-#			threadDeqNext(t,M):=true	#"next" variable set . if we did not get here then its "null"
-#		}
-#	};
-	inLine(t,d3):= false;
-	inLine (t,d4):= true
-}
-action d4_action (t:thread) = {#if head == real head continue to d5 else return to d0
-	assume inLine(t,d4);
-	if some n:node. threadDeqHead(t,n){
-		if some m:node. head(m){
-			if n=m{
-				inLine(t,d4):= false;
-				inLine (t,d5):= true
-			}else{
-				inLine(t,d4):= false;
-				inLine (t,d0):= true
+
+action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:node) = { # D4-9 get first->next and check emptyness and return it
+	assume inLine(t,d2);
+	assume tail(globalTail);
+	assume threadDeqHead(t,tFirst);
+	assume threadDeqLast(t,tLast);
+	assume reach(tFirst,firstNext) & (reach(N,firstNext) -> reach(tFirst,N));
+	threadDeqNext(t,M) := false;	#set to false for all nodes
+	# D4
+	threadDeqNext(t,firstNext) := true;
+	# D5-6
+	if tFirst = tLast {
+		if firstNext = nullNode {
+			# D7
+			# linearization point EMPTY
+			threadDeqReturnNode(t, nullNode) := true;
+			inLine (t,d2) := false;
+			inLine (t,TODO returning line) := true # TODO build "return mechanism" and then fix here
+		} else {
+			# D9 CAS(&tail, last, next);
+			if globalTail = tLast {
+				tail(globalTail) := false;
+				tail(firstNext) := true;
+				inLine (t,d2) := false;
+				inLine (t,d0) := true # goto loop start
 			}
 		}
+	} else {
+		inLine(t,d2):= false;
+		inLine (t,d3):= true
 	}
+}
+
+action d3_action (t:thread) = {# D11
+ # TODO from scratch
+
+}
+
+action d4_action (t:thread){
+ # TODO
 }
 
 action test = {
@@ -400,8 +412,7 @@ conjecture head(X) -> used(X)
 conjecture tail(X) -> used(X)
 conjecture head(X) & reach (X,Y) -> used(Y)
 conjecture (head(X) & tail (Y)) -> reach (X,Y)
-conjecture (head(X) & head(Y)) -> X=Y 
+conjecture (head(X) & head(Y)) -> X=Y
 conjecture (tail(X) & tail(Y)) -> X=Y
 
 conjecture threadEnqNode(T,X) -> (reach(X,Y) -> X=Y)
-
