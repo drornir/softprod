@@ -337,32 +337,7 @@ action d1_action (t:thread)= { # D3 get local tail
 	inLine(t,d1) := false;
 	inLine (t,d2) := true
 }
-
-action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:node) = { # D4-9 get first->next and check emptyness and return it
-	assume inLine(t,d2);
-	assume tail(globalTail);
-	assume threadDeqHead(t,tFirst);
-	assume threadDeqLast(t,tLast);
-	assume reach(tFirst,firstNext) & (reach(N,firstNext) -> reach(tFirst,N));
-	threadDeqNext(t,M) := false;	#set to false for all nodes
-	# D4
-	threadDeqNext(t,firstNext) := true;
-	# D5-6
-	if tFirst = tLast {
-		if firstNext = nullNode {
-			# D7
-			# linearization point EMPTY
-			threadDeqReturnNode(t, nullNode) := true;
-			inLine (t,d2) := false;
-			inLine (t,TODO returning line) := true # TODO build "return mechanism" and then fix here
-		} else {
-			# D9 CAS(&tail, last, next);
-			if globalTail = tLast {
 				tail(globalTail) := false;
-				tail(firstNext) := true;
-			};
-			inLine (t,d2) := false;
-			inLine (t,d0) := true # goto loop start
 		}
 	} else {
 		inLine(t,d2):= false;
