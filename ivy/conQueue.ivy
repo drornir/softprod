@@ -210,21 +210,23 @@ action e0_action (t:thread,n:node)= { #simulating lines E1
 	assume inLine(t,e0);
 	assume ~used(n);
 	assume (reach(X,n) | reach (n,X)) -> n=X;
+	inLine(t,e0):= false;
+
 	threadEnqNode(t,n):= true;
 	used(n):= true;
 	reach(n,nullNode):=true;
-	inLine(t,e0):= false;
 	inLine (t,e1):= true
 }
 
 action e1_action (t:thread,globalTail:node)= { #simulating line E3
 	assume inLine(t,e1);
 	assume tail(globalTail);
+	inLine(t,e1):= false;
+
 	threadEnqLast(t,M):=false; 	#set to false for all nodes (edit: i dont think this is needed)
 
 	threadEnqLast(t,globalTail):=true;
 
-	inLine(t,e1):= false;
 	inLine (t,e2):= true
 }
 
@@ -232,11 +234,12 @@ action e2_action (t:thread,tLast:node,lastNext:node)= { #simulating line E4
 	assume inLine(t,e2);
 	assume threadEnqLast(t,tLast);
 	assume reach(tLast,lastNext) & (reach(N,lastNext) -> reach(tLast,N));
+	inLine(t,e2):= false;
+
 	threadEnqNext(t,M):=false;	#set to false for all nodes
 
 	threadEnqNext(t,lastNext):=true;
 
-	inLine(t,e2):= false;
 	inLine (t,e3):= true
 }
 
@@ -244,24 +247,24 @@ action e3_action (t:thread,tLast:node,globalTail:node)= { #simulating line E5 //
 	assume inLine(t,e3);
 	assume threadEnqLast(t,tLast);
 	assume tail(globalTail);
-			if globalTail=tLast{
-				inLine(t,e3):= false;
-				inLine (t,e4):= true
-			}else{
-				inLine(t,e3):= false;
-				inLine (t,e1):= true
-			}
+	inLine(t,e3):= false;
+
+	if globalTail=tLast {
+		inLine (t,e4) := true
+	} else {
+		inLine (t,e1) := true
+	}
 }
 
 action e4_action (t:thread,tLast:node)= { #simulating line E7
 	assume inLine(t,e4);
 	assume threadEnqLast(t,tLast);
+	inLine(t,e4):= false;
+
 	if tLast = nullNode {
-		inLine(t,e4):= false;
 		inLine(t,e5):= true
 	}
 	else {
-		inLine(t,e4):= false;
 		inLine(t,e6):= true
 	}
 
@@ -271,16 +274,15 @@ action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating 
 	assume threadEnqNode(t,newNode);
 	assume threadEnqLast(t,last);
 	assume reach(last,lastNext) & (reach(X,lastNext) -> reach(X,last));
+	inLine(t,e5):=false;
 
 	# cas(lastNext,nullNode,newNode)
 	if lastNext = nullNode {
 		reach(last, lastNext) := false;
 		reach(last, newNode) := true;
-		inLine(t,e5):=false;
 		inLine(t,e7):=true #goto line E14
 	}
 	else {
-		inLine(t,e5):=false;
 		inLine(t,e6):=true #goto line E11
 	}
 }
@@ -290,13 +292,13 @@ action e6_action (t:thread, globalTail:node, last:node, next:node) = { #line E11
 	assume tail(globalTail);
 	assume threadEnqLast(t,last);
 	assume threadEnqNext(t,next);
+	inLine(t,e6):=false;
 
 	if globalTail = last {
 		tail(globalTail) := false;
 		tail(next) := true
 	};
 
-	inLine(t,e6):=false;
 	inLine(t,e7):=true #goto line E14
 }
 
@@ -305,6 +307,7 @@ action e7_action (t:thread, globalTail:node, last:node, newNode:node) = { #line 
 	assume tail(globalTail);
 	assume threadEnqLast(t,last);
 	assume threadEnqNode(t,newNode);
+	inLine(t,e7):=false;
 
 	# cas(globalTail,last,newNode)
 	if globalTail = last {
@@ -312,7 +315,6 @@ action e7_action (t:thread, globalTail:node, last:node, newNode:node) = { #line 
 		tail(newNode) := true
 	};
 
-	inLine(t,e7):=false;
 	inLine(t,finishedLine):=true
 }
 
@@ -320,27 +322,53 @@ action e7_action (t:thread, globalTail:node, last:node, newNode:node) = { #line 
 
 action d0_action (t:thread)= { # D2 get local head
 	assume inLine(t,d0);
+	inLine(t,d0) := false;
+
 	threadDeqHead(t,M) := false; 	#set to false for all nodes
 	if some n:node. head(n){
 		threadDeqHead(t,n) := true
 	};
-	inLine(t,d0) := false;
 	inLine (t,d1) := true
 }
 
 action d1_action (t:thread)= { # D3 get local tail
 	assume inLine(t,d1);
+	inLine(t,d1) := false;
+
 	threadDeqLast(t,M) := false; 	#set to false for all nodes
 	if some n:node. tail(n){
 		threadDeqLast(t,n) := true
 	};
-	inLine(t,d1) := false;
 	inLine (t,d2) := true
 }
+
+action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:node) = { # D4-9 get first->next and check emptyness and return it
+	assume inLine(t,d2);
+	assume tail(globalTail);
+	assume threadDeqHead(t,tFirst);
+	assume threadDeqLast(t,tLast);
+	assume reach(tFirst,firstNext) & (reach(N,firstNext) -> reach(tFirst,N));
+	inLine (t,d2) := false;
+
+	threadDeqNext(t,M) := false;	#set to false for all nodes
+	# D4
+	threadDeqNext(t,firstNext) := true;
+	# D5-6
+	if tFirst = tLast {
+		if firstNext = nullNode {
+			# D7
+			# linearization point EMPTY
+			threadDeqReturnNode(t, nullNode) := true;
+			inLine (t,TODO returning line) := true # TODO build "return mechanism" and then fix here
+		} else {
+			# D9 CAS(&tail, last, next);
+			if globalTail = tLast {
 				tail(globalTail) := false;
+				tail(firstNext) := true;
+			};
+			inLine (t,d0) := true # goto loop start
 		}
 	} else {
-		inLine(t,d2):= false;
 		inLine (t,d3):= true
 	}
 }
@@ -350,7 +378,7 @@ action d3_action (t:thread) = {# D11
 
 }
 
-action d4_action (t:thread){
+action d4_action (t:thread) = {
  # TODO
 }
 
