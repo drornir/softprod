@@ -353,11 +353,12 @@ action d1_action (t:thread)= { # D3 get local tail
 	inLine (t,d2) := true
 }
 
-action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node) = { # D4-6 get first->next and check emptiness
-# if the queue is empty, the linearization point is on D4, but we KNOW it was a
+
+# if the queue is empty, the linearization point is at D4, but we KNOW it was a
 # linearization point only at D7. However 'first', 'last' and 'next' of D5-6 can
 # not asynchronously change, because they are local variables of the thread.
 # Therefore, we can implement D4-6 in a single action without harming correctness.
+action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node) = { # D4-6 get first->next and check emptiness
 	assume inLine(t,d2);
 	assume tail(globalTail);
 	assume threadDeqHead(t,tFirst);
@@ -389,6 +390,7 @@ action d3_action (t:thread, tLast:node, firstNext:node, globalTail:node) = {# D9
 	assume threadDeqNext(t,firstNext);
 	assume tail(globalTail);
 	inLine(t,d3):=false;
+
 	# D9 CAS(&tail, last, next);
 	if globalTail = tLast {
 		tail(globalTail) := false;
@@ -411,6 +413,7 @@ action d5_action (t:thread,tFirst:node,globalHead:node,firstNext:node) = {#D12
 	assume threadDeqHead(t,tFirst);
 	assume reach(tFirst,firstNext) & (reach(N,firstNext) -> reach(tFirst,N));
 	inLine(t,d5):=false;
+
 	if globalHead = tFirst{
 		head(globalHead):=false;
 		head(firstNext):=true;
@@ -424,6 +427,7 @@ action dReturn_action(t:thread,rv:node) returns(returnNode:node) = {
 	assume inLine(t,dReturn);
 	assume threadDeqReturnNode(t, rv);
 	inLine(t,dReturn):=false;
+
 	inLine(t,l0):=true;
 	returnNode :=rv
 }
