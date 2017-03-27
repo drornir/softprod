@@ -52,42 +52,23 @@ individual nullNode:node
 
 axiom initNode ~=nullNode
 
-
-#line 0 different from all else
-axiom l0 ~= e0
-axiom l0 ~= e1
-axiom l0 ~= e2
-axiom l0 ~= e3
-axiom l0 ~= e4
-axiom l0 ~= e5
-axiom l0 ~= e6
-axiom l0 ~= e7
-axiom l0 ~= d0
-axiom l0 ~= d1
-axiom l0 ~= d2
-axiom l0 ~= d3
-axiom l0 ~= d4
-axiom l0 ~= d5
-axiom l0 ~= dReturn
-
-
-axiom finishedLine ~= e0
-axiom finishedLine ~= e1
-axiom finishedLine ~= e2
-axiom finishedLine ~= e3
-axiom finishedLine ~= e4
-axiom finishedLine ~= e5
-axiom finishedLine ~= e6
-axiom finishedLine ~= e7
-axiom finishedLine ~= d0
-axiom finishedLine ~= d1
-axiom finishedLine ~= d2
-axiom finishedLine ~= d3
-axiom finishedLine ~= d4
-axiom finishedLine ~= d5
-axiom finishedLine ~= dReturn
-
-#enqueue lines different
+#automatically generated axioms
+axiom l0~=e0
+axiom l0~=e1
+axiom l0~=e2
+axiom l0~=e3
+axiom l0~=e4
+axiom l0~=e5
+axiom l0~=e6
+axiom l0~=e7
+axiom l0~=d0
+axiom l0~=d1
+axiom l0~=d2
+axiom l0~=d3
+axiom l0~=d4
+axiom l0~=d5
+axiom l0~=finishedLine
+axiom l0~=dReturn
 axiom e0~=e1
 axiom e0~=e2
 axiom e0~=e3
@@ -101,8 +82,8 @@ axiom e0~=d2
 axiom e0~=d3
 axiom e0~=d4
 axiom e0~=d5
-axiom e0 ~= dReturn
-
+axiom e0~=finishedLine
+axiom e0~=dReturn
 axiom e1~=e2
 axiom e1~=e3
 axiom e1~=e4
@@ -115,8 +96,8 @@ axiom e1~=d2
 axiom e1~=d3
 axiom e1~=d4
 axiom e1~=d5
-axiom e1 ~= dReturn
-
+axiom e1~=finishedLine
+axiom e1~=dReturn
 axiom e2~=e3
 axiom e2~=e4
 axiom e2~=e5
@@ -128,8 +109,8 @@ axiom e2~=d2
 axiom e2~=d3
 axiom e2~=d4
 axiom e2~=d5
-axiom e2 ~= dReturn
-
+axiom e2~=finishedLine
+axiom e2~=dReturn
 axiom e3~=e4
 axiom e3~=e5
 axiom e3~=e6
@@ -140,8 +121,8 @@ axiom e3~=d2
 axiom e3~=d3
 axiom e3~=d4
 axiom e3~=d5
-axiom e3 ~= dReturn
-
+axiom e3~=finishedLine
+axiom e3~=dReturn
 axiom e4~=e5
 axiom e4~=e6
 axiom e4~=e7
@@ -151,8 +132,8 @@ axiom e4~=d2
 axiom e4~=d3
 axiom e4~=d4
 axiom e4~=d5
-axiom e4 ~= dReturn
-
+axiom e4~=finishedLine
+axiom e4~=dReturn
 axiom e5~=e6
 axiom e5~=e7
 axiom e5~=d0
@@ -161,8 +142,8 @@ axiom e5~=d2
 axiom e5~=d3
 axiom e5~=d4
 axiom e5~=d5
-axiom e5 ~= dReturn
-
+axiom e5~=finishedLine
+axiom e5~=dReturn
 axiom e6~=e7
 axiom e6~=d0
 axiom e6~=d1
@@ -170,40 +151,45 @@ axiom e6~=d2
 axiom e6~=d3
 axiom e6~=d4
 axiom e6~=d5
-axiom e6 ~= dReturn
-
+axiom e6~=finishedLine
+axiom e6~=dReturn
 axiom e7~=d0
 axiom e7~=d1
 axiom e7~=d2
 axiom e7~=d3
 axiom e7~=d4
 axiom e7~=d5
-axiom e7 ~= dReturn
-
+axiom e7~=finishedLine
+axiom e7~=dReturn
 axiom d0~=d1
 axiom d0~=d2
 axiom d0~=d3
 axiom d0~=d4
 axiom d0~=d5
-axiom d0 ~= dReturn
-
+axiom d0~=finishedLine
+axiom d0~=dReturn
 axiom d1~=d2
 axiom d1~=d3
 axiom d1~=d4
 axiom d1~=d5
-axiom d1 ~= dReturn
-
+axiom d1~=finishedLine
+axiom d1~=dReturn
 axiom d2~=d3
 axiom d2~=d4
 axiom d2~=d5
-axiom d2 ~= dReturn
-
+axiom d2~=finishedLine
+axiom d2~=dReturn
 axiom d3~=d4
 axiom d3~=d5
-axiom d3 ~= dReturn
-
+axiom d3~=finishedLine
+axiom d3~=dReturn
 axiom d4~=d5
-axiom d4 ~= dReturn
+axiom d4~=finishedLine
+axiom d4~=dReturn
+axiom d5~=finishedLine
+axiom d5~=dReturn
+axiom finishedLine~=dReturn
+
 
 
 
@@ -368,6 +354,7 @@ action d1_action (t:thread)= { # D3 get local tail
 }
 
 action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:node) = { # D4-9 get first->next and check emptyness and return it
+#TODO dror needs to document this action
 	assume inLine(t,d2);
 	assume tail(globalTail);
 	assume threadDeqHead(t,tFirst);
