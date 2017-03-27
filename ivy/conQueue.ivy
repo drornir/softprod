@@ -45,6 +45,7 @@ individual d2:line #first line in dequeue
 individual d3:line #first line in dequeue
 individual d4:line #first line in dequeue
 individual d5:line #first line in dequeue
+individual dReturn:line #first line in dequeue
 
 individual initNode:node
 individual nullNode:node
@@ -67,6 +68,7 @@ axiom l0 ~= d2
 axiom l0 ~= d3
 axiom l0 ~= d4
 axiom l0 ~= d5
+axiom l0 ~= dReturn
 
 
 axiom finishedLine ~= e0
@@ -83,6 +85,7 @@ axiom finishedLine ~= d2
 axiom finishedLine ~= d3
 axiom finishedLine ~= d4
 axiom finishedLine ~= d5
+axiom finishedLine ~= dReturn
 
 #enqueue lines different
 axiom e0~=e1
@@ -98,6 +101,7 @@ axiom e0~=d2
 axiom e0~=d3
 axiom e0~=d4
 axiom e0~=d5
+axiom e0 ~= dReturn
 
 axiom e1~=e2
 axiom e1~=e3
@@ -111,6 +115,7 @@ axiom e1~=d2
 axiom e1~=d3
 axiom e1~=d4
 axiom e1~=d5
+axiom e1 ~= dReturn
 
 axiom e2~=e3
 axiom e2~=e4
@@ -123,6 +128,7 @@ axiom e2~=d2
 axiom e2~=d3
 axiom e2~=d4
 axiom e2~=d5
+axiom e2 ~= dReturn
 
 axiom e3~=e4
 axiom e3~=e5
@@ -134,6 +140,7 @@ axiom e3~=d2
 axiom e3~=d3
 axiom e3~=d4
 axiom e3~=d5
+axiom e3 ~= dReturn
 
 axiom e4~=e5
 axiom e4~=e6
@@ -144,6 +151,7 @@ axiom e4~=d2
 axiom e4~=d3
 axiom e4~=d4
 axiom e4~=d5
+axiom e4 ~= dReturn
 
 axiom e5~=e6
 axiom e5~=e7
@@ -153,6 +161,7 @@ axiom e5~=d2
 axiom e5~=d3
 axiom e5~=d4
 axiom e5~=d5
+axiom e5 ~= dReturn
 
 axiom e6~=e7
 axiom e6~=d0
@@ -161,24 +170,40 @@ axiom e6~=d2
 axiom e6~=d3
 axiom e6~=d4
 axiom e6~=d5
+axiom e6 ~= dReturn
+
+axiom e7~=d0
+axiom e7~=d1
+axiom e7~=d2
+axiom e7~=d3
+axiom e7~=d4
+axiom e7~=d5
+axiom e7 ~= dReturn
 
 axiom d0~=d1
 axiom d0~=d2
 axiom d0~=d3
 axiom d0~=d4
 axiom d0~=d5
+axiom d0 ~= dReturn
 
 axiom d1~=d2
 axiom d1~=d3
 axiom d1~=d4
 axiom d1~=d5
+axiom d1 ~= dReturn
 
 axiom d2~=d3
 axiom d2~=d4
 axiom d2~=d5
+axiom d2 ~= dReturn
 
 axiom d3~=d4
 axiom d3~=d5
+axiom d3 ~= dReturn
+
+axiom d4~=d5
+axiom d4 ~= dReturn
 
 
 
@@ -359,27 +384,50 @@ action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:
 			# D7
 			# linearization point EMPTY
 			threadDeqReturnNode(t, nullNode) := true;
-			inLine (t,TODO returning line) := true # TODO build "return mechanism" and then fix here
+			inLine (t,dReturn) := true # TODO build "return mechanism" and then fix here
 		} else {
 			# D9 CAS(&tail, last, next);
 			if globalTail = tLast {
 				tail(globalTail) := false;
-				tail(firstNext) := true;
+				tail(firstNext) := true
 			};
-			inLine (t,d0) := true # goto loop start
+			inLine(t,d0) := true # goto loop start
 		}
 	} else {
 		inLine (t,d3):= true
 	}
 }
 
-action d3_action (t:thread) = {# D11
- # TODO from scratch
+action d3_action (t:thread,tFirst:node) = {# D11
+ 	assume inLine(t,d3);
+	inLine(t,d3):=false;
+ 	assume threadDeqHead(t,tFirst);
+	threadDeqReturnNode(t,tFirst):=true;
+	inLine(t,d4):=true
 
 }
 
-action d4_action (t:thread) = {
- # TODO
+action d4_action (t:thread,tFirst:node,globalHead:node,firstNext:node) = {#D12
+	assume inLine(t,d4);
+	assume head(globalHead);
+	assume threadDeqHead(t,tFirst);
+	assume reach(tFirst,firstNext) & (reach(N,firstNext) -> reach(tFirst,N));
+	inLine(t,d4):=false;
+	if globalHead = tFirst{
+		head(globalHead):=false;
+		head(firstNext):=true;
+		inLine (t,dReturn) := true # TODO build "return mechanism" and then fix here
+	}else{
+		inLine(t,d0):=true# goto loop start
+	}	
+}
+
+action dReturn_action(t:thread,rv:node) returns(returnNode:node) = {
+	assume inLine(t,dReturn);
+	assume threadDeqReturnNode(t, rv);
+	inLine(t,dReturn):=false;
+	inLine(t,l0):=true;
+	returnNode :=rv
 }
 
 action test = {
