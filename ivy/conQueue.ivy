@@ -353,8 +353,11 @@ action d1_action (t:thread)= { # D3 get local tail
 	inLine (t,d2) := true
 }
 
-action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:node) = { # D4-9 get first->next and check emptyness and return it
-#TODO dror needs to document this action
+action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node) = { # D4-6 get first->next and check emptiness
+# if the queue is empty, the linearization point is on D4, but we KNOW it was a
+# linearization point only at D7. However 'first', 'last' and 'next' of D5-6 can
+# not asynchronously change, because they are local variables of the thread.
+# Therefore, we can implement D4-6 in a single action without harming correctness.
 	assume inLine(t,d2);
 	assume tail(globalTail);
 	assume threadDeqHead(t,tFirst);
@@ -373,40 +376,48 @@ action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:
 			threadDeqReturnNode(t, nullNode) := true;
 			inLine (t,dReturn) := true # TODO build "return mechanism" and then fix here
 		} else {
-			# D9 CAS(&tail, last, next);
-			if globalTail = tLast {
-				tail(globalTail) := false;
-				tail(firstNext) := true
-			};
-			inLine(t,d0) := true # goto loop start
+			inLine(t,d3) := true # cas
 		}
 	} else {
-		inLine (t,d3):= true
+		inLine (t,d4):= true
 	}
 }
 
-action d3_action (t:thread,tFirst:node) = {# D11
+action d3_action (t:thread, tLast:node, firstNext:node, globalTail:node) = {# D9
  	assume inLine(t,d3);
+	assume threadDeqLast(t,tLast);
+	assume threadDeqNext(t,firstNext);
+	assume tail(globalTail);
 	inLine(t,d3):=false;
- 	assume threadDeqHead(t,tFirst);
-	threadDeqReturnNode(t,tFirst):=true;
-	inLine(t,d4):=true
-
+	# D9 CAS(&tail, last, next);
+	if globalTail = tLast {
+		tail(globalTail) := false;
+		tail(firstNext) := true
+	};
+	inLine(t,d0):=true # loop start
 }
 
-action d4_action (t:thread,tFirst:node,globalHead:node,firstNext:node) = {#D12
+action d4_action (t:thread,tFirst:node,globalHead:node,firstNext:node) = {#D11
 	assume inLine(t,d4);
+	inLine(t,d4):=false;
+ 	assume threadDeqHead(t,tFirst);
+	threadDeqReturnNode(t,tFirst):=true;
+	inLine(t,d5):=true
+}
+
+action d5_action (t:thread,tFirst:node,globalHead:node,firstNext:node) = {#D12
+	assume inLine(t,d5);
 	assume head(globalHead);
 	assume threadDeqHead(t,tFirst);
 	assume reach(tFirst,firstNext) & (reach(N,firstNext) -> reach(tFirst,N));
-	inLine(t,d4):=false;
+	inLine(t,d5):=false;
 	if globalHead = tFirst{
 		head(globalHead):=false;
 		head(firstNext):=true;
 		inLine (t,dReturn) := true # TODO build "return mechanism" and then fix here
 	}else{
-		inLine(t,d0):=true# goto loop start
-	}	
+		inLine(t,d0):=true # goto loop start
+	}
 }
 
 action dReturn_action(t:thread,rv:node) returns(returnNode:node) = {
