@@ -2,6 +2,8 @@
 # ivy ui=cti conQueue.ivy
 # no longer based on this implementation: https://www.cs.rochester.edu/research/synchronization/pseudocode/queues.html
 
+#TODO make sure order of conQ and serQ is the same
+
 type node
 type state
 type thread
@@ -291,6 +293,7 @@ action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating 
 	if lastNext = nullNode {
 		reach(last, lastNext) := false;
 		reach(last, newNode) := true;
+		# TODO reach(X,Y) := reach(X,Y) | (reach(X,tail) & Y = n);
 		inLine(t,e7):=true #goto line E14
 	}
 	else {
