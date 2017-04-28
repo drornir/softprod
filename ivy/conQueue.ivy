@@ -294,6 +294,10 @@ action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating 
 		reach(last, lastNext) := false;
 		reach(last, newNode) := true;
 		# TODO reach(X,Y) := reach(X,Y) | (reach(X,tail) & Y = n);
+
+		#is that okay?
+		reach(X,Y) := reach(X,Y) | (reach(X,last) & Y = newNode);
+
 		inLine(t,e7):=true #goto line E14
 	}
 	else {
