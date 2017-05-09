@@ -1,8 +1,8 @@
 #lang ivy1.5
 
 # List implementation notes:
-# - all nodes are reachable to themselves, even if they are not in the list
-# - the head is a sentinel
+# - all nodes are reachSeqable to themselves, even if they are not in the list
+# - the headSeq is a sentinelSeq
 
 # - assume a before b only on linearization point
 # - we may assume uniqness of inserted elements
@@ -10,19 +10,19 @@
 #plan:
 #individual for each line of code (E7, D2)
 #type line
-#type thread  - holds current program counter, and every local field (head, tail etc.). saving local variables is through relations.
+#type thread  - holds current program counter, and every local field (headSeq, tailSeq etc.). saving local variables is through relations.
 #
 #relation used(X) - was there a thread that started inserting this node?
 
 type node
 type state
 
-relation reach (N1:node, N2:node)# if N2 is reachable from N1
-relation nondet
-individual sentinel:node
-individual head:node
-individual tail:node
-individual empty:node
+relation reachSeq (N1:node, N2:node)# if N2 is reachSeqable from N1
+relation nondetSeq
+individual sentinelSeq:node
+individual headSeq:node
+individual tailSeq:node
+individual emptySeq:node
 
 individual a:node
 individual b:node
@@ -50,22 +50,22 @@ axiom q4 ~= qe
 axiom Q = q1 | Q = q2 | Q = qe | Q=q3 | Q=q4
 
 axiom a ~= b
-axiom a ~= empty
-axiom b ~= empty
-axiom a ~= sentinel
-axiom b ~= sentinel
-axiom empty ~= sentinel
+axiom a ~= emptySeq
+axiom b ~= emptySeq
+axiom a ~= sentinelSeq
+axiom b ~= sentinelSeq
+axiom emptySeq ~= sentinelSeq
 
-init reach(N1, N2) <-> N1 = N2 # every node is reachable only from itself
-init sentinel = head & head = tail & empty ~= head # the list contains only the head sentinel
+init reachSeq(N1, N2) <-> N1 = N2 # every node is reachSeqable only from itself
+init sentinelSeq = headSeq & headSeq = tailSeq & emptySeq ~= headSeq # the list contains only the headSeq sentinelSeq
 init qc = q1 # the DFA's initial state is q1
 
 action q1_action = {
     assume qc = q1;
     local x:node {
-  		nondet := *;
-      if nondet {
-			assume x ~= empty;
+  		nondetSeq := *;
+      if nondetSeq {
+			assume x ~= emptySeq;
 			assume x ~= b;
 			call enq(x);
         if x = a {
@@ -85,9 +85,9 @@ action q2_action = {
 	assume qc = q2;
 	local x:node {
 		assume x ~= a;
-		nondet := *;
-		if nondet {
-      assume x ~= empty;
+		nondetSeq := *;
+		if nondetSeq {
+      assume x ~= emptySeq;
 			call enq(x);
 			if x = b {
 				qc := q3
@@ -95,7 +95,7 @@ action q2_action = {
 		}
 		else {
 			call x := deq();
-			if x = b | x = empty {
+			if x = b | x = emptySeq {
 				qc := qe
 			};
 			if x = a {
@@ -109,14 +109,14 @@ action q3_action = {
 	assume qc = q3;
 	local x:node {
 		assume x ~= a & x ~= b;
-		nondet := *;
-		if nondet {
-			assume x ~= empty;
+		nondetSeq := *;
+		if nondetSeq {
+			assume x ~= emptySeq;
 			call enq(x)
 		}
 		else {
 			call x := deq();
-			if x = b | x = empty {
+			if x = b | x = emptySeq {
 			 qc := qe
 			};
 			if x = a {
@@ -130,9 +130,9 @@ action q4_action = {
 	assume qc = q4;
 	local x:node {
 		assume x ~= a & x ~= b;
-		nondet := *;
-		if nondet {
-			assume x ~= empty;
+		nondetSeq := *;
+		if nondetSeq {
+			assume x ~= emptySeq;
 			call enq(x)
 		}
 		else {
@@ -140,7 +140,7 @@ action q4_action = {
 			if x = b {
 				qc := q1
 			};
-			if x = a | x = empty{
+			if x = a | x = emptySeq{
 				qc := qe
 			}
 		}
@@ -149,22 +149,22 @@ action q4_action = {
 
 
 action enq(n:node) = {
-  assume n~= empty;
-  assume ~reach(head,n);
-  assume reach(n,X) -> X = n;
-  reach(X,Y) := reach(X,Y) | (reach(X,tail) & Y = n);
-  tail := n
+  assume n~= emptySeq;
+  assume ~reachSeq(headSeq,n);
+  assume reachSeq(n,X) -> X = n;
+  reachSeq(X,Y) := reachSeq(X,Y) | (reachSeq(X,tailSeq) & Y = n);
+  tailSeq := n
 }
 
 action deq returns(n:node) = {
-    if (head = tail) {
-        n := empty
+    if (headSeq = tailSeq) {
+        n := emptySeq
     }
     else {
-        assume reach(head,n) & ((reach(X,n) -> (n=X | X=head))) & n ~= head;
-        reach(X,Y):= (reach(X,Y) & Y ~= n & X ~= n) | X = Y;
-        if (reach(head,X) -> head = X) {
-            tail := head
+        assume reachSeq(headSeq,n) & ((reachSeq(X,n) -> (n=X | X=headSeq))) & n ~= headSeq;
+        reachSeq(X,Y):= (reachSeq(X,Y) & Y ~= n & X ~= n) | X = Y;
+        if (reachSeq(headSeq,X) -> headSeq = X) {
+            tailSeq := headSeq
         }
     }
 }
@@ -179,25 +179,25 @@ export q3_action
 export q4_action
 
 
-conjecture reach(X,X)
-conjecture (reach(X,Y) & reach(Y,Z)) -> reach(X,Z)
-conjecture reach(X,Y) & reach(Y,X) -> X = Y
-conjecture reach(X,Y) & reach(X,Z) -> reach(Y,Z) | reach(Z,Y)
-conjecture reach(head,tail)
-conjecture (forall X. reach(head,X) -> (head = X)) -> head = tail
-conjecture reach(tail,X) -> X=tail
+conjecture reachSeq(X,X)
+conjecture (reachSeq(X,Y) & reachSeq(Y,Z)) -> reachSeq(X,Z)
+conjecture reachSeq(X,Y) & reachSeq(Y,X) -> X = Y
+conjecture reachSeq(X,Y) & reachSeq(X,Z) -> reachSeq(Y,Z) | reachSeq(Z,Y)
+conjecture reachSeq(headSeq,tailSeq)
+conjecture (forall X. reachSeq(headSeq,X) -> (headSeq = X)) -> headSeq = tailSeq
+conjecture reachSeq(tailSeq,X) -> X=tailSeq
 conjecture qc ~= qe
-conjecture empty ~=head & empty ~=sentinel & empty ~= tail
-conjecture sentinel = head
-conjecture head=tail -> ( reach(X,tail) -> X = tail )
-conjecture reach(X,tail) -> reach(head,X)
-conjecture (reach(X,Y) & X~=Y) -> reach(X,tail)# if a node is connected, it must be in the queue
-conjecture (reach (X,empty) | reach (empty, X)) -> X= empty
+conjecture emptySeq ~=headSeq & emptySeq ~=sentinelSeq & emptySeq ~= tailSeq
+conjecture sentinelSeq = headSeq
+conjecture headSeq=tailSeq -> ( reachSeq(X,tailSeq) -> X = tailSeq )
+conjecture reachSeq(X,tailSeq) -> reachSeq(headSeq,X)
+conjecture (reachSeq(X,Y) & X~=Y) -> reachSeq(X,tailSeq)# if a node is connected, it must be in the queue
+conjecture (reachSeq (X,emptySeq) | reachSeq (emptySeq, X)) -> X= emptySeq
 
-conjecture qc=q1 -> (reach(X,a) | reach(a,X)) -> (X=a & a~=head & a~=tail)
-conjecture qc=q1 -> ~reach(b,tail)
-conjecture qc=q2 -> reach(a,tail)
-conjecture qc=q2 -> ~reach(b,tail)
-conjecture qc=q3 -> (reach(a,tail) & reach (b,tail) & reach (a,b))
-conjecture qc=q4 ->~reach (a,tail)
-conjecture qc=q4-> reach(b,tail)
+conjecture qc=q1 -> (reachSeq(X,a) | reachSeq(a,X)) -> (X=a & a~=headSeq & a~=tailSeq)
+conjecture qc=q1 -> ~reachSeq(b,tailSeq)
+conjecture qc=q2 -> reachSeq(a,tailSeq)
+conjecture qc=q2 -> ~reachSeq(b,tailSeq)
+conjecture qc=q3 -> (reachSeq(a,tailSeq) & reachSeq (b,tailSeq) & reachSeq (a,b))
+conjecture qc=q4 ->~reachSeq (a,tailSeq)
+conjecture qc=q4-> reachSeq(b,tailSeq)
