@@ -290,13 +290,14 @@ action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating 
 	inLine(t,e5):=false;
 
 	# cas(lastNext,nullNode,newNode)
-	if lastNext = nullNode {
+	if lastNext = nullNode {#sucessfull CAS, node inserted
 		reach(last, lastNext) := false;
 		reach(last, newNode) := true;
 		# TODO reach(X,Y) := reach(X,Y) | (reach(X,tail) & Y = n);
 
-		#is that okay?
 		reach(X,Y) := reach(X,Y) | (reach(X,last) & Y = newNode);
+
+		call enq(newNode);
 
 		inLine(t,e7):=true #goto line E14
 	}
@@ -383,6 +384,9 @@ action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:
 			# D7
 			# linearization point EMPTY
 			threadDeqReturnNode(t, nullNode) := true;
+
+			assert deq() = emptySeq;
+
 			inLine (t,dReturn) := true # TODO build "return mechanism" and then fix here
 		} else {
 			# D9 CAS(&tail, last, next);
@@ -425,7 +429,8 @@ action dReturn_action(t:thread,rv:node) returns(returnNode:node) = {
 	assume inLine(t,dReturn);
 	assume threadDeqReturnNode(t, rv);
 	inLine(t,dReturn):=false;
-	inLine(t,l0):=true;
+#	inLine(t,l0):=true; # no need to run again, we can assume each thread only makes one action and then gets stuck in dReturn
+	assert deq() = returnNode;
 	returnNode :=rv
 }
 
@@ -442,6 +447,11 @@ export e4_action
 export e5_action
 #export e6_action
 #export e7_action
+#export d1_action
+#export d2_action
+#export d3_action
+#export d4_action
+#export d4_action
 export test
 
 conjecture reach(X,X)
@@ -466,3 +476,57 @@ conjecture (head(X) & head(Y)) -> X=Y
 conjecture (tail(X) & tail(Y)) -> X=Y
 
 conjecture threadEnqNode(T,X) -> (reach(X,Y) -> X=Y)
+
+
+
+
+##############################################################################
+##############################################################################
+##############################################################################
+#SEQUENTIAL QUEUE
+##############################################################################
+##############################################################################
+##############################################################################
+
+relation reachSeq (N1:node, N2:node)# if N2 is reachSeqable from N1
+
+individual emptySeq:node
+individual headSeq:node
+individual tailSeq:node
+
+init reachSeq(N1, N2) <-> N1 = N2 # every node is reachSeqable only from itself
+init   headSeq = tailSeq & emptySeq ~= headSeq # the list contains only the headSeq
+
+action enq(n:node) = {
+  assume n~= emptySeq;
+  assume ~reachSeq(headSeq,n);
+  assume reachSeq(n,X) -> X = n;
+  reachSeq(X,Y) := reachSeq(X,Y) | (reachSeq(X,tailSeq) & Y = n);
+  tailSeq := n
+}
+
+action deq returns(n:node) = {
+    if (headSeq = tailSeq) {
+        n := emptySeq
+    }
+    else {
+        assume reachSeq(headSeq,n) & ((reachSeq(X,n) -> (n=X | X=headSeq))) & n ~= headSeq;
+        reachSeq(X,Y):= (reachSeq(X,Y) & Y ~= n & X ~= n) | X = Y;
+        if (reachSeq(headSeq,X) -> headSeq = X) {
+            tailSeq := headSeq
+        }
+    }
+}
+
+conjecture reachSeq(X,X)
+conjecture (reachSeq(X,Y) & reachSeq(Y,Z)) -> reachSeq(X,Z)
+conjecture reachSeq(X,Y) & reachSeq(Y,X) -> X = Y
+conjecture reachSeq(X,Y) & reachSeq(X,Z) -> reachSeq(Y,Z) | reachSeq(Z,Y)
+conjecture reachSeq(headSeq,tailSeq)
+conjecture (forall X. reachSeq(headSeq,X) -> (headSeq = X)) -> headSeq = tailSeq
+conjecture reachSeq(tailSeq,X) -> X=tailSeq
+conjecture emptySeq ~=headSeq & emptySeq ~= tailSeq
+conjecture headSeq=tailSeq -> ( reachSeq(X,tailSeq) -> X = tailSeq )
+conjecture reachSeq(X,tailSeq) -> reachSeq(headSeq,X)
+conjecture (reachSeq(X,Y) & X~=Y) -> reachSeq(X,tailSeq)# if a node is connected, it must be in the queue
+conjecture (reachSeq (X,emptySeq) | reachSeq (emptySeq, X)) -> X= emptySeq
