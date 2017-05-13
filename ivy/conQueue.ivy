@@ -203,8 +203,9 @@ init used(initNode) & used(nullNode)
 init ~threadEnqNode(T,N)
 init ~threadEnqLast(T,N)
 init ~threadEnqNext(T,N)
+init reach (X,Y) ->(X=Y) | Y=nullNode
+init reach(X,X)
 init reach(N,nullNode)
-
 
 action l0_action(t:thread) = { #decide on an action (enqueue or dequeue)
 	assume inLine (t,l0);
@@ -435,17 +436,17 @@ action dReturn_action(t:thread,rv:node) returns(returnNode:node) = {
 }
 
 action test = {
-	assert (threadEnqNode (T,N1) & threadEnqNode (T,N2)) -> N1=N2
+	 
 }
 
-export l0_action
-export e0_action
-export e1_action
-export e2_action
-export e3_action
-export e4_action
-export e5_action
-#export e6_action
+#export l0_action
+#export e0_action
+#export e1_action
+#export e2_action
+#export e3_action
+#export e4_action
+#export e5_action
+export e6_action
 #export e7_action
 #export d1_action
 #export d2_action
@@ -476,6 +477,7 @@ conjecture (head(X) & head(Y)) -> X=Y
 conjecture (tail(X) & tail(Y)) -> X=Y
 
 conjecture threadEnqNode(T,X) -> (reach(X,Y) -> X=Y)
+conjecture (threadEnqNode (T,N1) & threadEnqNode (T,N2)) -> N1=N2
 
 
 
