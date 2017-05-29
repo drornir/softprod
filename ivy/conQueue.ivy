@@ -4,14 +4,34 @@
 
 #TODO make sure order of conQ and serQ is the same
 
+
 type node
-type state
 type thread
 type line
 
+
 relation reach (N1:node, N2:node)# if N2 is reachable from N1
 relation nondet
-relation inLine (T:thread, L:line) # each thread currently in l0 or some line in the dequeue or enqueue
+relation inLinel0(T:thread)
+relation inLinee0(T:thread)
+relation inLinee1(T:thread)
+relation inLinee2(T:thread)
+relation inLinee3(T:thread)
+relation inLinee4(T:thread)
+relation inLinee5(T:thread)
+relation inLinee6(T:thread)
+relation inLinee7(T:thread)
+relation inLinefinishedLine(T:thread)
+relation inLined0(T:thread)
+relation inLined1(T:thread)
+relation inLined2(T:thread)
+relation inLined3(T:thread)
+relation inLined4(T:thread)
+relation inLined5(T:thread)
+relation inLinedReturn(T:thread)
+
+conjecture inLinel0(T1) & inLinee0(T2) -> T1 ~= T2
+
 relation used (N:node) #in order to simulate 'new' node being created
 
 #enq vars
@@ -28,175 +48,35 @@ relation head(N:node)
 relation tail(N:node)
 
 
-individual l0:line #starting line
+#individual l0:line #starting line
 
-individual e0:line # first line in enqeue
-individual e1:line # first line in enqeue loop
-individual e2:line # set "next"
-individual e3:line # first compare
-individual e4:line # second compare and CAS if needed
-individual e5:line # last line in enqeue
-individual e6:line
-individual e7:line
+#individual e0:line # first line in enqeue
+#individual e1:line # first line in enqeue loop
+#individual e2:line # set "next"
+#individual e3:line # first compare
+#individual e4:line # second compare and CAS if needed
+#individual e5:line # last line in enqeue
+#individual e6:line
+#individual e7:line
 
-individual finishedLine:line
+#individual finishedLine:line
 
-individual d0:line #first line in dequeue
-individual d1:line #first line in dequeue
-individual d2:line #first line in dequeue
-individual d3:line #first line in dequeue
-individual d4:line #first line in dequeue
-individual d5:line #first line in dequeue
-individual dReturn:line #first line in dequeue
+#individual d0:line #first line in dequeue
+#individual d1:line #first line in dequeue
+#individual d2:line #first line in dequeue
+#individual d3:line #first line in dequeue
+#individual d4:line #first line in dequeue
+#individual d5:line #first line in dequeue
+#individual dReturn:line #first line in dequeue
 
 individual initNode:node
 individual nullNode:node
 
 axiom initNode ~=nullNode
 
-#automatically generated axioms
-axiom l0~=e0
-axiom l0~=e1
-axiom l0~=e2
-axiom l0~=e3
-axiom l0~=e4
-axiom l0~=e5
-axiom l0~=e6
-axiom l0~=e7
-axiom l0~=d0
-axiom l0~=d1
-axiom l0~=d2
-axiom l0~=d3
-axiom l0~=d4
-axiom l0~=d5
-axiom l0~=finishedLine
-axiom l0~=dReturn
-axiom e0~=e1
-axiom e0~=e2
-axiom e0~=e3
-axiom e0~=e4
-axiom e0~=e5
-axiom e0~=e6
-axiom e0~=e7
-axiom e0~=d0
-axiom e0~=d1
-axiom e0~=d2
-axiom e0~=d3
-axiom e0~=d4
-axiom e0~=d5
-axiom e0~=finishedLine
-axiom e0~=dReturn
-axiom e1~=e2
-axiom e1~=e3
-axiom e1~=e4
-axiom e1~=e5
-axiom e1~=e6
-axiom e1~=e7
-axiom e1~=d0
-axiom e1~=d1
-axiom e1~=d2
-axiom e1~=d3
-axiom e1~=d4
-axiom e1~=d5
-axiom e1~=finishedLine
-axiom e1~=dReturn
-axiom e2~=e3
-axiom e2~=e4
-axiom e2~=e5
-axiom e2~=e6
-axiom e2~=e7
-axiom e2~=d0
-axiom e2~=d1
-axiom e2~=d2
-axiom e2~=d3
-axiom e2~=d4
-axiom e2~=d5
-axiom e2~=finishedLine
-axiom e2~=dReturn
-axiom e3~=e4
-axiom e3~=e5
-axiom e3~=e6
-axiom e3~=e7
-axiom e3~=d0
-axiom e3~=d1
-axiom e3~=d2
-axiom e3~=d3
-axiom e3~=d4
-axiom e3~=d5
-axiom e3~=finishedLine
-axiom e3~=dReturn
-axiom e4~=e5
-axiom e4~=e6
-axiom e4~=e7
-axiom e4~=d0
-axiom e4~=d1
-axiom e4~=d2
-axiom e4~=d3
-axiom e4~=d4
-axiom e4~=d5
-axiom e4~=finishedLine
-axiom e4~=dReturn
-axiom e5~=e6
-axiom e5~=e7
-axiom e5~=d0
-axiom e5~=d1
-axiom e5~=d2
-axiom e5~=d3
-axiom e5~=d4
-axiom e5~=d5
-axiom e5~=finishedLine
-axiom e5~=dReturn
-axiom e6~=e7
-axiom e6~=d0
-axiom e6~=d1
-axiom e6~=d2
-axiom e6~=d3
-axiom e6~=d4
-axiom e6~=d5
-axiom e6~=finishedLine
-axiom e6~=dReturn
-axiom e7~=d0
-axiom e7~=d1
-axiom e7~=d2
-axiom e7~=d3
-axiom e7~=d4
-axiom e7~=d5
-axiom e7~=finishedLine
-axiom e7~=dReturn
-axiom d0~=d1
-axiom d0~=d2
-axiom d0~=d3
-axiom d0~=d4
-axiom d0~=d5
-axiom d0~=finishedLine
-axiom d0~=dReturn
-axiom d1~=d2
-axiom d1~=d3
-axiom d1~=d4
-axiom d1~=d5
-axiom d1~=finishedLine
-axiom d1~=dReturn
-axiom d2~=d3
-axiom d2~=d4
-axiom d2~=d5
-axiom d2~=finishedLine
-axiom d2~=dReturn
-axiom d3~=d4
-axiom d3~=d5
-axiom d3~=finishedLine
-axiom d3~=dReturn
-axiom d4~=d5
-axiom d4~=finishedLine
-axiom d4~=dReturn
-axiom d5~=finishedLine
-axiom d5~=dReturn
-axiom finishedLine~=dReturn
 
 
-
-
-
-init inLine(T,l0) & (inLine (T,L) -> L=l0)
+#init inLine(T,l0) & (inLine (T,L) -> L=l0)
 init head(N) -> N=initNode
 init tail(N) -> N=initNode
 init used(initNode) & used(nullNode)
@@ -208,87 +88,87 @@ init reach(X,X)
 init reach(N,nullNode)
 
 action l0_action(t:thread) = { #decide on an action (enqueue or dequeue)
-	assume inLine (t,l0);
-	inLine(t,l0) := false;
+	assume inLinel0 (t);
+	inLinel0(t) := false;
 	nondet :=*;
 	if nondet {
-		inLine(t,d0) := true
+		inLined0(t) := true
 	}
 	else {
-		inLine (t,e0) := true
+		inLinee0 (t) := true
 	}
 
 }
 
 action e0_action (t:thread,n:node)= { #simulating lines E1
-	assume inLine(t,e0);
+	assume inLinee0(t);
 	assume ~used(n);
 	assume (reach(X,n) | reach (n,X)) -> n=X;
-	inLine(t,e0):= false;
+	inLinee0(t):= false;
 
 	threadEnqNode(t,n):= true;
 	used(n):= true;
 	reach(n,nullNode):=true;
-	inLine (t,e1):= true
+	inLinee1 (t):= true
 }
 
 action e1_action (t:thread,globalTail:node)= { #simulating line E3
-	assume inLine(t,e1);
+	assume inLinee1(t);
 	assume tail(globalTail);
-	inLine(t,e1):= false;
+	inLinee1(t):= false;
 
 	threadEnqLast(t,M):=false; 	#set to false for all nodes (edit: i dont think this is needed)
 
 	threadEnqLast(t,globalTail):=true;
 
-	inLine (t,e2):= true
+	inLinee2 (t):= true
 }
 
 action e2_action (t:thread,tLast:node,lastNext:node)= { #simulating line E4
-	assume inLine(t,e2);
+	assume inLinee2(t);
 	assume threadEnqLast(t,tLast);
 	assume reach(tLast,lastNext) & (reach(N,lastNext) -> reach(tLast,N));
-	inLine(t,e2):= false;
+	inLinee2(t):= false;
 
 	threadEnqNext(t,M):=false;	#set to false for all nodes
 
 	threadEnqNext(t,lastNext):=true;
 
-	inLine (t,e3):= true
+	inLinee3 (t):= true
 }
 
 action e3_action (t:thread,tLast:node,globalTail:node)= { #simulating line E5 //if the condition holds go to next line . otherwise go to loop start
-	assume inLine(t,e3);
+	assume inLinee3(t);
 	assume threadEnqLast(t,tLast);
 	assume tail(globalTail);
-	inLine(t,e3):= false;
+	inLinee3(t):= false;
 
 	if globalTail=tLast {
-		inLine (t,e4) := true
+		inLinee4 (t) := true
 	} else {
-		inLine (t,e1) := true
+		inLinee1 (t) := true
 	}
 }
 
 action e4_action (t:thread,tLast:node)= { #simulating line E7
-	assume inLine(t,e4);
+	assume inLinee4(t);
 	assume threadEnqLast(t,tLast);
-	inLine(t,e4):= false;
+	inLinee4(t):= false;
 
 	if tLast = nullNode {
-		inLine(t,e5):= true
+		inLinee5(t):= true
 	}
 	else {
-		inLine(t,e6):= true
+		inLinee6(t):= true
 	}
 
 }
 action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating line E8
-	assume inLine(t,e5);
+	assume inLinee5(t);
 	assume threadEnqNode(t,newNode);
 	assume threadEnqLast(t,last);
 	assume reach(last,lastNext) & (reach(X,lastNext) -> reach(X,last));
-	inLine(t,e5):=false;
+	inLinee5(t):=false;
 
 	# cas(lastNext,nullNode,newNode)
 	if lastNext = nullNode {#sucessfull CAS, node inserted
@@ -300,34 +180,34 @@ action e5_action (t:thread,last:node,lastNext:node,newNode:node)= { #simulating 
 
 		call enq(newNode);
 
-		inLine(t,e7):=true #goto line E14
+		inLinee7(t):=true #goto line E14
 	}
 	else {
-		inLine(t,e6):=true #goto line E11
+		inLinee6(t):=true #goto line E11
 	}
 }
 
 action e6_action (t:thread, globalTail:node, last:node, next:node) = { #line E11
-	assume inLine(t,e6);
+	assume inLinee6(t);
 	assume tail(globalTail);
 	assume threadEnqLast(t,last);
 	assume threadEnqNext(t,next);
-	inLine(t,e6):=false;
+	inLinee6(t):=false;
 
 	if globalTail = last {
 		tail(globalTail) := false;
 		tail(next) := true
 	};
 
-	inLine(t,e7):=true #goto line E14
+	inLinee7(t):=true #goto line E14
 }
 
 action e7_action (t:thread, globalTail:node, last:node, newNode:node) = { #line 14
-	assume inLine(t,e7);
+	assume inLinee7(t);
 	assume tail(globalTail);
 	assume threadEnqLast(t,last);
 	assume threadEnqNode(t,newNode);
-	inLine(t,e7):=false;
+	inLinee7(t):=false;
 
 	# cas(globalTail,last,newNode)
 	if globalTail = last {
@@ -335,31 +215,31 @@ action e7_action (t:thread, globalTail:node, last:node, newNode:node) = { #line 
 		tail(newNode) := true
 	};
 
-	inLine(t,finishedLine):=true
+	inLinefinishedLine(t):=true
 }
 
 ###################### DEQUEUE ########################
 
 action d0_action (t:thread)= { # D2 get local head
-	assume inLine(t,d0);
-	inLine(t,d0) := false;
+	assume inLined0(t);
+	inLined0(t) := false;
 
 	threadDeqHead(t,M) := false; 	#set to false for all nodes
 	if some n:node. head(n){
 		threadDeqHead(t,n) := true
 	};
-	inLine (t,d1) := true
+	inLined1 (t) := true
 }
 
 action d1_action (t:thread)= { # D3 get local tail
-	assume inLine(t,d1);
-	inLine(t,d1) := false;
+	assume inLined1(t);
+	inLined1(t) := false;
 
 	threadDeqLast(t,M) := false; 	#set to false for all nodes
 	if some n:node. tail(n){
 		threadDeqLast(t,n) := true
 	};
-	inLine (t,d2) := true
+	inLined2 (t) := true
 }
 
 
@@ -369,12 +249,12 @@ action d1_action (t:thread)= { # D3 get local tail
 # Therefore, we can implement D4-6 in a single action without harming correctness.
 action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:node) = { # D4-9 get first->next and check emptyness and return it
 #TODO dror needs to document this action
-	assume inLine(t,d2);
+	assume inLined2(t);
 	assume tail(globalTail);
 	assume threadDeqHead(t,tFirst);
 	assume threadDeqLast(t,tLast);
 	assume reach(tFirst,firstNext) & (reach(N,firstNext) -> reach(tFirst,N));
-	inLine (t,d2) := false;
+	inLined2 (t) := false;
 
 	threadDeqNext(t,M) := false;	#set to false for all nodes
 	# D4
@@ -388,49 +268,49 @@ action d2_action (t:thread, tFirst:node, tLast:node, firstNext:node, globalTail:
 
 			assert deq() = emptySeq;
 
-			inLine (t,dReturn) := true # TODO build "return mechanism" and then fix here
+			inLinedReturn (t) := true # TODO build "return mechanism" and then fix here
 		} else {
 			# D9 CAS(&tail, last, next);
 			if globalTail = tLast {
 				tail(globalTail) := false;
 				tail(firstNext) := true
 			};
-			inLine(t,d0) := true # goto loop start
+			inLined0(t) := true # goto loop start
 		}
 	} else {
-		inLine (t,d3):= true
+		inLined3 (t):= true
 	}
 }
 
 action d3_action (t:thread,tFirst:node) = {# D11
- 	assume inLine(t,d3);
-	inLine(t,d3):=false;
+ 	assume inLined3(t);
+	inLined3(t):=false;
  	assume threadDeqHead(t,tFirst);
 	threadDeqReturnNode(t,tFirst):=true;
-	inLine(t,d4):=true
+	inLined4(t):=true
 
 }
 
 action d4_action (t:thread,tFirst:node,globalHead:node,firstNext:node) = {#D12
-	assume inLine(t,d4);
+	assume inLined4(t);
 	assume head(globalHead);
 	assume threadDeqHead(t,tFirst);
 	assume reach(tFirst,firstNext) & (reach(N,firstNext) -> reach(tFirst,N));
-	inLine(t,d4):=false;
+	inLined4(t):=false;
 	if globalHead = tFirst{
 		head(globalHead):=false;
 		head(firstNext):=true;
-		inLine (t,dReturn) := true # TODO build "return mechanism" and then fix here
+		inLinedReturn (t) := true # TODO build "return mechanism" and then fix here
 	}else{
-		inLine(t,d0):=true# goto loop start
+		inLined0(t):=true# goto loop start
 	}	
 }
 
 action dReturn_action(t:thread,rv:node) returns(returnNode:node) = {
-	assume inLine(t,dReturn);
+	assume inLinedReturn(t);
 	assume threadDeqReturnNode(t, rv);
-	inLine(t,dReturn):=false;
-#	inLine(t,l0):=true; # no need to run again, we can assume each thread only makes one action and then gets stuck in dReturn
+	inLinedReturn(t):=false;
+#	inLinel0(t):=true; # no need to run again, we can assume each thread only makes one action and then gets stuck in dReturn
 	assert deq() = returnNode;
 	returnNode :=rv
 }
@@ -453,7 +333,7 @@ export e6_action
 #export d3_action
 #export d4_action
 #export d4_action
-export test
+#export test
 
 conjecture reach(X,X)
 conjecture (reach(X,Y) & reach(Y,Z)) -> reach(X,Z)
@@ -461,8 +341,8 @@ conjecture reach(X,Y) & reach(Y,X) -> X = Y
 conjecture reach(X,Y) & reach(X,Z) -> reach(Y,Z) | reach(Z,Y)
 
 conjecture (threadEnqNode (T,N1) & threadEnqNode (T,N2)) -> N1=N2
-conjecture (inLine (T,L) & (L=l0 | L=e0 | L=d0) ) -> ~threadEnqNode(T,N)
-conjecture (inLine (T,L1) & inLine (T,L2)) -> L1=L2
+#conjecture (inLine (T,L) & (L=l0 | L=e0 | L=d0) ) -> ~threadEnqNode(T,N)
+#conjecture (inLine (T,L1) & inLine (T,L2)) -> L1=L2
 conjecture head(N1) & head(N2) -> N1=N2
 
 conjecture (threadEnqNext (T,N1) & threadEnqNext (T,N2)) -> N1=N2
@@ -525,10 +405,149 @@ conjecture (reachSeq(X,Y) & reachSeq(Y,Z)) -> reachSeq(X,Z)
 conjecture reachSeq(X,Y) & reachSeq(Y,X) -> X = Y
 conjecture reachSeq(X,Y) & reachSeq(X,Z) -> reachSeq(Y,Z) | reachSeq(Z,Y)
 conjecture reachSeq(headSeq,tailSeq)
-conjecture (forall X. reachSeq(headSeq,X) -> (headSeq = X)) -> headSeq = tailSeq
+#conjecture (forall X. reachSeq(headSeq,X) -> (headSeq = X)) -> headSeq = tailSeq
 conjecture reachSeq(tailSeq,X) -> X=tailSeq
 conjecture emptySeq ~=headSeq & emptySeq ~= tailSeq
 conjecture headSeq=tailSeq -> ( reachSeq(X,tailSeq) -> X = tailSeq )
 conjecture reachSeq(X,tailSeq) -> reachSeq(headSeq,X)
 conjecture (reachSeq(X,Y) & X~=Y) -> reachSeq(X,tailSeq)# if a node is connected, it must be in the queue
 conjecture (reachSeq (X,emptySeq) | reachSeq (emptySeq, X)) -> X= emptySeq
+
+
+#automatically generated conjectures
+conjecture inLinel0(T1) & inLinee0(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLinee1(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLinee2(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLinee3(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLinee4(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLinee5(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLinee6(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLinee7(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLined0(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLinel0(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLinee1(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLinee2(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLinee3(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLinee4(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLinee5(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLinee6(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLinee7(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLined0(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLinee0(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLinee2(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLinee3(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLinee4(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLinee5(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLinee6(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLinee7(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLined0(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLinee1(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLinee3(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLinee4(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLinee5(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLinee6(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLinee7(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLined0(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLinee2(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLinee4(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLinee5(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLinee6(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLinee7(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLined0(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLinee3(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLinee5(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLinee6(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLinee7(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLined0(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLinee4(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLinee6(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLinee7(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLined0(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLinee5(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLinee6(T1) & inLinee7(T2) -> T1 ~= T2
+conjecture inLinee6(T1) & inLined0(T2) -> T1 ~= T2
+conjecture inLinee6(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLinee6(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLinee6(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLinee6(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLinee6(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLinee6(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLinee6(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLinee7(T1) & inLined0(T2) -> T1 ~= T2
+conjecture inLinee7(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLinee7(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLinee7(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLinee7(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLinee7(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLinee7(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLinee7(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLined0(T1) & inLined1(T2) -> T1 ~= T2
+conjecture inLined0(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLined0(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLined0(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLined0(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLined0(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLined0(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLined1(T1) & inLined2(T2) -> T1 ~= T2
+conjecture inLined1(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLined1(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLined1(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLined1(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLined1(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLined2(T1) & inLined3(T2) -> T1 ~= T2
+conjecture inLined2(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLined2(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLined2(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLined2(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLined3(T1) & inLined4(T2) -> T1 ~= T2
+conjecture inLined3(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLined3(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLined3(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLined4(T1) & inLined5(T2) -> T1 ~= T2
+conjecture inLined4(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLined4(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLined5(T1) & inLinefinishedLine(T2) -> T1 ~= T2
+conjecture inLined5(T1) & inLinedReturn(T2) -> T1 ~= T2
+conjecture inLinefinishedLine(T1) & inLinedReturn(T2) -> T1 ~= T2
